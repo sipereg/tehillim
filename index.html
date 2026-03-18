@@ -374,9 +374,13 @@ if('serviceWorker' in navigator) {
   <button class="rem-submit" id="rem-btn" onclick="subscribeReminders()">
     <span>🔔</span><span>הפעל תזכורות</span>
   </button>
-  <div class="rem-done" id="rem-done">
-    ✅ מעולה! תקבלו תזכורות לאמירת מזמור לתודה
-    <button onclick="cancelReminder()" style="margin-right:12px;background:none;border:1.5px solid rgba(239,68,68,.3);color:#DC2626;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;font-family:Heebo,sans-serif;cursor:pointer">ביטול תזכורות</button>
+  <div class="rem-done" id="rem-done" style="flex-direction:column;align-items:flex-end;gap:8px">
+    <div style="display:flex;align-items:center;gap:8px">
+      ✅ מעולה! תקבלו תזכורות לאמירת מזמור לתודה
+      <button onclick="cancelReminder()" style="background:none;border:1.5px solid rgba(239,68,68,.3);color:#DC2626;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;font-family:Heebo,sans-serif;cursor:pointer">ביטול</button>
+    </div>
+    <div id="rem-saved-info" style="font-size:12px;color:#8878BB;text-align:right"></div>
+    <div style="font-size:12px;color:#8878BB">אם לא מקבלים התראות — בדקו שהתראות מותרות בהגדרות הדפדפן ובהגדרות המחשב/טלפון</div>
   </div>
   </div>
 </div>
@@ -796,6 +800,11 @@ async function subscribeReminders() {
           } catch(e2) {
             try { subId = OneSignal.User?.onesignalId; } catch(e3) {}
           }
+          // Save prefs to localStorage for display
+          localStorage.setItem('rem_prefs', JSON.stringify({
+            freq: tagData.reminder_freq,
+            times: tagData.reminder_times
+          }));
           // Save to Supabase reminders table
           await db.from('reminders').upsert({
             uid: myId,
@@ -824,6 +833,7 @@ async function subscribeReminders() {
 function cancelReminder() {
   localStorage.removeItem('rem_active');
   localStorage.removeItem('reminder_prefs');
+  localStorage.removeItem('rem_prefs');
   document.getElementById('rem-done').style.display = 'none';
   document.getElementById('rem-btn').style.display = 'inline-flex';
   document.getElementById('rem-btn').innerHTML = '<span>🔔</span><span>הפעל תזכורות</span>';
@@ -839,9 +849,14 @@ function cancelReminder() {
 }
 
 // restore if already subscribed
-if(localStorage.getItem('rem_active')) {
+const savedPrefs = JSON.parse(localStorage.getItem('rem_prefs') || 'null');
+if(localStorage.getItem('rem_active') && savedPrefs) {
   document.getElementById('rem-btn').style.display = 'none';
   document.getElementById('rem-done').style.display = 'flex';
+  // show saved info
+  const freqLabel = {'once':'פעם ביום','three':'3 פעמים ביום','random':'שעה רנדומלית','custom':'בחירה חופשית'};
+  const info = document.getElementById('rem-saved-info');
+  if(info) info.textContent = '⏰ ' + (freqLabel[savedPrefs.freq]||savedPrefs.freq) + ' | ' + savedPrefs.times;
 }
 function scrollToReminder() {
   const el = document.getElementById('rem-card');
