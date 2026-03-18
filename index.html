@@ -237,6 +237,9 @@ if('serviceWorker' in navigator) {
     await OneSignal.init({
       appId: "a51e51fb-c845-43ff-9c14-e03fe574bce5",
       notifyButton: { enable: false },
+      serviceWorkerPath: "/OneSignalSDKWorker.js",
+      serviceWorkerParam: { scope: "/" },
+      allowLocalhostAsSecureOrigin: true,
     });
   });
 </script>
