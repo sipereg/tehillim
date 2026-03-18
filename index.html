@@ -92,8 +92,8 @@ body.dark .sub{color:#7A6BA8}
 @keyframes spin{to{transform:rotate(360deg)}}
 .circ-svg{position:absolute;inset:0;z-index:1;overflow:visible}
 .circ-inner{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
-/* ── תיקון: גודל פונט מינימלי גדול יותר בעיגול ── */
-.big-num{font-size:clamp(22px,5.5vw,48px);font-weight:900;line-height:1.15;background:linear-gradient(135deg,#9B7DFF,#F43F8E);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ── תיקון: גודל פונט דינמי בעיגול ── */
+.big-num{font-weight:900;line-height:1.15;background:linear-gradient(135deg,#9B7DFF,#F43F8E);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .of-txt{font-size:19px;color:#8878BB;font-weight:600}
 body.dark .of-txt{color:#7A6BA8}
 .lbl-txt{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8878BB}
@@ -271,6 +271,14 @@ if('serviceWorker' in navigator) {
       allowLocalhostAsSecureOrigin: true,
     });
   });
+</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V9ENT651EM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-V9ENT651EM');
 </script>
 </head>
 <body>
@@ -514,7 +522,25 @@ const urlRef = new URLSearchParams(location.search).get('ref') || 'direct';
 // shared (from Supabase)
 let shared = { total:0, uniq:0, target:100, title:'קריאת תהילים משותפת', subtitle:'הצטרפו לקריאת מזמור לתודה' };
 
-function setCircle(val, target) {
+function fitBigNum() {
+  const el = document.getElementById('num-el');
+  if (!el) return;
+  const txt = el.textContent.replace(/[^0-9,]/g,'');
+  const len = txt.replace(/,/g,'').length;
+  // גודל לפי מספר ספרות — כמה שיותר גדול בתוך העיגול
+  let size;
+  if      (len <= 3)  size = 58;
+  else if (len <= 4)  size = 52;
+  else if (len <= 5)  size = 46;
+  else if (len <= 6)  size = 40;
+  else if (len <= 7)  size = 34;
+  else                size = 28;
+  // על מסכים קטנים — הקטן ב-20%
+  if (window.innerWidth <= 400) size = Math.round(size * 0.82);
+  el.style.fontSize = size + 'px';
+}
+
+
   const el = document.getElementById('prog-el');
   if (!el) return;
   const pct = Math.min(1, val / Math.max(1, target));
@@ -574,6 +600,7 @@ function renderDOM() {
   }
   // chip display handled above
   setCircle(shared.total, shared.target);
+  fitBigNum();
   if (myReads > 0) {
     document.getElementById('note').style.display = 'block';
     document.getElementById('my-n').textContent   = myReads;
