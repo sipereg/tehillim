@@ -222,6 +222,14 @@ body.dark .rem-done{color:#34D399}
 @keyframes pfall{0%{opacity:1;transform:translate(0,0) rotate(0deg)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) rotate(480deg)}}
 .ring{position:absolute;border-radius:50%;animation:rexp .7s ease forwards}
 @keyframes rexp{0%{opacity:.6;transform:translate(-50%,-50%) scale(0)}100%{opacity:0;transform:translate(-50%,-50%) scale(3)}}
+
+/* ── מסכים קטנים בלבד (סמסונג קטן וכו') ── */
+@media (max-width:380px){
+  .big-num{font-size:clamp(26px,8vw,48px)}
+  .st-n{font-size:clamp(14px,4.2vw,22px)}
+  .st{padding:14px 6px}
+  .st-l{font-size:11px}
+}
 </style>
 <script>
 // Register OneSignal service worker via CDN
