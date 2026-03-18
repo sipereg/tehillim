@@ -237,8 +237,6 @@ body.dark .rem-done{color:#34D399}
 .fx{position:fixed;inset:0;pointer-events:none;z-index:90;overflow:hidden}
 .part{position:absolute;animation:pfall 1s ease forwards}
 @keyframes pfall{0%{opacity:1;transform:translate(0,0) rotate(0deg)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) rotate(480deg)}}
-body.dark #milestone-bar{background:linear-gradient(135deg,rgba(155,125,255,0.12),rgba(244,63,142,0.08));border-color:rgba(155,125,255,0.25)}
-body.dark #milestone-bar div{color:#C4B8E8}
 .ring{position:absolute;border-radius:50%;animation:rexp .7s ease forwards}
 @keyframes rexp{0%{opacity:.6;transform:translate(-50%,-50%) scale(0)}100%{opacity:0;transform:translate(-50%,-50%) scale(3)}}
 
@@ -307,9 +305,6 @@ if('serviceWorker' in navigator) {
 <p class="sub" id="pg-sub">הצטרפו לקריאת מזמור לתודה</p>
 
 <div class="circ-section">
-  <div id="milestone-bar" style="display:none;text-align:center;background:linear-gradient(135deg,rgba(155,125,255,0.15),rgba(244,63,142,0.1));border:1.5px solid rgba(155,125,255,0.35);border-radius:18px;padding:14px 22px;width:100%">
-    <div style="font-size:15px;color:#3D3060;font-weight:600;line-height:2">🎉 הגענו למעלה מ<br><strong style="font-size:22px;background:linear-gradient(135deg,#9B7DFF,#F43F8E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">30,000 מזמורים!</strong><br>תודה לכל אחד ואחת שהצטרף 🙏</div>
-  </div>
   <div class="circ-outer">
     <div class="circ-glow"></div>
     <svg class="circ-svg" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
@@ -582,8 +577,6 @@ function renderDOM() {
   }
   // chip display handled above
   setCircle(shared.total, shared.target);
-  // ── milestone check ──
-  checkMilestone(shared.total);
   if (myReads > 0) {
     document.getElementById('note').style.display = 'block';
     document.getElementById('my-n').textContent   = myReads;
@@ -921,41 +914,6 @@ function toggleReminder() {
 function togglePrivacy() {
   const p = document.getElementById('privacy-panel');
   p.style.display = p.style.display === 'none' ? 'block' : 'none';
-}
-
-// ── Milestone ──
-const MILESTONE_START = 30000;
-const MILESTONE_END   = 31000;
-
-function checkMilestone(total) {
-  if (total < MILESTONE_START || total >= MILESTONE_END) return;
-  showMilestone();
-}
-
-function showMilestone() {
-  const el = document.getElementById('milestone-bar');
-  if (!el) return;
-  el.style.display = 'block';
-  launchFireworks();
-  setTimeout(launchFireworks, 800);
-  setTimeout(launchFireworks, 1600);
-}
-
-function launchFireworks() {
-  const fx = document.getElementById('fx');
-  if (!fx) return;
-  const cols = ['#9B7DFF','#F43F8E','#06B6D4','#F59E0B','#10B981','#FFFFFF'];
-  for (let i = 0; i < 60; i++) {
-    const p = document.createElement('div');
-    p.className = 'part';
-    const x = 20 + Math.random() * 60;
-    const y = 20 + Math.random() * 40;
-    const a = Math.random() * Math.PI * 2;
-    const d = 80 + Math.random() * 140;
-    p.style.cssText = `left:${x}vw;top:${y}vh;width:${5+Math.random()*6}px;height:${5+Math.random()*6}px;background:${cols[Math.floor(Math.random()*cols.length)]};--tx:${Math.cos(a)*d}px;--ty:${Math.sin(a)*d}px;animation-delay:${Math.random()*0.3}s;border-radius:${Math.random()>0.5?'50%':'3px'};position:fixed;z-index:99`;
-    fx.appendChild(p);
-    setTimeout(() => p.remove(), 1200);
-  }
 }
 
 // Init
