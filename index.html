@@ -373,6 +373,7 @@ if('serviceWorker' in navigator) {
   </button>
   <div class="rem-done" id="rem-done">
     ✅ מעולה! תקבלו תזכורות לאמירת מזמור לתודה
+    <button onclick="cancelReminder()" style="margin-right:12px;background:none;border:1.5px solid rgba(239,68,68,.3);color:#DC2626;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;font-family:Heebo,sans-serif;cursor:pointer">ביטול תזכורות</button>
   </div>
   </div>
 </div>
@@ -797,6 +798,21 @@ async function subscribeReminders() {
     btn.innerHTML = '<span>🔔</span><span>הפעל תזכורות</span>';
     btn.disabled = false;
   }
+}
+
+function cancelReminder() {
+  localStorage.removeItem('rem_active');
+  localStorage.removeItem('reminder_prefs');
+  document.getElementById('rem-done').style.display = 'none';
+  document.getElementById('rem-btn').style.display = 'inline-flex';
+  document.getElementById('rem-btn').innerHTML = '<span>🔔</span><span>הפעל תזכורות</span>';
+  document.getElementById('rem-btn').disabled = false;
+  // remove tags from OneSignal
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    try { await OneSignal.User.removeTags(['reminder_freq','reminder_times','reminder_days','reminder_sound']); } catch(e){}
+  });
+  toast('התזכורות בוטלו');
 }
 
 // restore if already subscribed
