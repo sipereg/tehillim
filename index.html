@@ -789,17 +789,23 @@ async function subscribeReminders() {
             reminder_days: document.getElementById('rem-days')?.value || '1',
             reminder_sound: document.getElementById('rem-sound').checked ? '1' : '0'
           };
-          // Try new API first, fallback to old
+          // Get OneSignal subscription ID and save to Supabase
+          let subId = null;
           try {
-            if(OneSignal.User && OneSignal.User.addTags) {
-              await OneSignal.User.addTags(tagData);
-            } else if(OneSignal.sendTags) {
-              await OneSignal.sendTags(tagData);
-            }
+            subId = await OneSignal.User.PushSubscription.id;
           } catch(e2) {
-            // Try legacy API
-            try { await OneSignal.sendTags(tagData); } catch(e3) { console.log('tags error:', e3); }
+            try { subId = OneSignal.User?.onesignalId; } catch(e3) {}
           }
+          // Save to Supabase reminders table
+          await db.from('reminders').upsert({
+            uid: myId,
+            onesignal_id: subId || myId,
+            freq: tagData.reminder_freq,
+            times: tagData.reminder_times,
+            days: tagData.reminder_days,
+            sound: tagData.reminder_sound,
+            active: true
+          });
           localStorage.setItem('rem_active', '1');
           res();
         } catch(e) { rej(e); }
@@ -826,11 +832,7 @@ function cancelReminder() {
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
     try {
-    if(OneSignal.User && OneSignal.User.removeTags) {
-      await OneSignal.User.removeTags(['reminder_freq','reminder_times','reminder_days','reminder_sound']);
-    } else {
-      await OneSignal.deleteTags(['reminder_freq','reminder_times','reminder_days','reminder_sound']);
-    }
+    await db.from('reminders').update({ active: false }).eq('uid', myId);
   } catch(e){}
   });
   toast('התזכורות בוטלו');
