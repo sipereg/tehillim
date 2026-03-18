@@ -81,15 +81,15 @@ body.dark .sub{color:#7A6BA8}
 body.dark .of-txt{color:#7A6BA8}
 .lbl-txt{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8878BB}
 body.dark .lbl-txt{color:#7A6BA8}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
-.st{background:#FFFFFF;border:1.5px solid rgba(109,77,255,.12);border-radius:16px;padding:18px 10px;text-align:center;position:relative;overflow:hidden;box-shadow:0 4px 16px rgba(109,77,255,.07)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;min-width:0;overflow:hidden}
+.st{background:#FFFFFF;border:1.5px solid rgba(109,77,255,.12);border-radius:16px;padding:18px 6px;text-align:center;position:relative;overflow:hidden;box-shadow:0 4px 16px rgba(109,77,255,.07);min-width:0}
 body.dark .st{background:#1C1830;border-color:rgba(155,125,255,.18)}
 .st::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
 .st.a::before{background:linear-gradient(90deg,#6D4DFF,#9B7DFF)}
 .st.b::before{background:linear-gradient(90deg,#06B6D4,#10B981)}
 .st.c::before{background:linear-gradient(90deg,#F43F8E,#F59E0B)}
 /* ── תיקון: גודל פונט responsive בריבועים ── */
-.st-n{font-size:clamp(18px,5.5vw,32px);font-weight:800;display:block;margin-bottom:4px;word-break:break-all}
+.st-n{font-size:clamp(18px,5.5vw,32px);font-weight:800;display:block;margin-bottom:4px;word-break:break-all;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .st.a .st-n{color:#6D4DFF} body.dark .st.a .st-n{color:#9B7DFF}
 .st.b .st-n{color:#0891B2} body.dark .st.b .st-n{color:#22D3EE}
 .st.c .st-n{color:#DB2777} body.dark .st.c .st-n{color:#F472B6}
@@ -224,11 +224,13 @@ body.dark .rem-done{color:#34D399}
 @keyframes rexp{0%{opacity:.6;transform:translate(-50%,-50%) scale(0)}100%{opacity:0;transform:translate(-50%,-50%) scale(3)}}
 
 /* ── מסכים קטנים בלבד (סמסונג קטן וכו') ── */
-@media (max-width:380px){
-  .big-num{font-size:clamp(26px,8vw,48px)}
-  .st-n{font-size:clamp(14px,4.2vw,22px)}
-  .st{padding:14px 6px}
-  .st-l{font-size:11px}
+@media (max-width:400px){
+  .big-num{font-size:clamp(28px,9vw,48px)}
+  .st-n{font-size:clamp(13px,4vw,20px)}
+  .st{padding:12px 4px}
+  .st-l{font-size:10px}
+  .circ-outer{width:220px;height:220px}
+  .stats{gap:6px}
 }
 </style>
 <script>
