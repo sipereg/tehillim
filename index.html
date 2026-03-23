@@ -787,67 +787,6 @@ async function subscribeReminders() {
     btn.disabled = false;
   }
 }
-  const btn = document.getElementById('rem-btn');
-  btn.innerHTML = '<span>⏳</span><span>מפעיל...</span>';
-  btn.disabled = true;
-  
-  // Note: browser will show its own permission dialog - this is mandatory
-  try {
-    await new Promise((res, rej) => {
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
-      OneSignalDeferred.push(async function(OneSignal) {
-        try {
-          const granted = await OneSignal.Notifications.requestPermission();
-          if(!granted) { rej(new Error('denied')); return; }
-          const times = [];
-          if(remFreq === 'custom') {
-            document.querySelectorAll('#rem-slots input[type=time]').forEach(i => times.push(i.value));
-          } else {
-            times.push(document.getElementById('rem-time').value);
-          }
-          // SDK v16 uses PushSubscription and tags via setAttribute
-          const tagData = {
-            reminder_freq: remFreq,
-            reminder_times: times.join(','),
-            reminder_days: document.getElementById('rem-days')?.value || '1',
-            reminder_sound: document.getElementById('rem-sound').checked ? '1' : '0'
-          };
-          // Get OneSignal subscription ID and save to Supabase
-          let subId = null;
-          try {
-            subId = await OneSignal.User.PushSubscription.id;
-          } catch(e2) {
-            try { subId = OneSignal.User?.onesignalId; } catch(e3) {}
-          }
-          // Save prefs to localStorage for display
-          localStorage.setItem('rem_prefs', JSON.stringify({
-            freq: tagData.reminder_freq,
-            times: tagData.reminder_times
-          }));
-          // Save to Supabase reminders table
-          await db.from('reminders').upsert({
-            uid: myId,
-            onesignal_id: subId || myId,
-            freq: tagData.reminder_freq,
-            times: tagData.reminder_times,
-            days: tagData.reminder_days,
-            sound: tagData.reminder_sound,
-            active: true
-          });
-          localStorage.setItem('rem_active', '1');
-          res();
-        } catch(e) { rej(e); }
-      });
-    });
-    document.getElementById('rem-btn').style.display = 'none';
-    document.getElementById('rem-done').style.display = 'flex';
-    toast('🔔 התזכורות הופעלו!');
-  } catch(e) {
-    toast('לא אושר — ניתן לשנות בהגדרות הדפדפן');
-    btn.innerHTML = '<span>🔔</span><span>הפעל תזכורות</span>';
-    btn.disabled = false;
-  }
-}
 
 function cancelReminder() {
   localStorage.removeItem('rem_active');
