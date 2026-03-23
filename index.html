@@ -375,59 +375,17 @@ if('serviceWorker' in navigator) {
     <span id="rem-arrow" style="font-size:18px;color:#8878BB;transition:transform .3s">▼</span>
   </div>
   <div id="rem-body" style="display:none;margin-top:14px">
-  <p class="sub">בחרו מתי לקבל תזכורת — בטלפון או במחשב</p>
-
-  <div class="freq-label">כמה פעמים?</div>
-  <div class="freq-opts">
-    <button class="freq-btn" id="fo1" onclick="selFreq('once',this)">פעם ביום</button>
-    <button class="freq-btn" id="fo2" onclick="selFreq('three',this)">3 פעמים ביום</button>
-    <button class="freq-btn" id="fo3" onclick="selFreq('random',this)">שעה רנדומלית</button>
-    <button class="freq-btn" id="fo4" onclick="selFreq('custom',this)">בחירה חופשית</button>
-  </div>
-
-  <div class="time-row" id="rem-time-row">
-    <label>שעה:</label>
-    <input type="time" id="rem-time" value="08:00">
-  </div>
-
-  <div class="custom-section" id="rem-custom">
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <label style="font-size:13px;color:#8878BB;font-weight:600">כל כמה ימים:</label>
-      <select id="rem-days">
-        <option value="1">כל יום</option>
-        <option value="2">כל יומיים</option>
-        <option value="3">כל 3 ימים</option>
-        <option value="7">פעם בשבוע</option>
-      </select>
-    </div>
-    <div>
-      <div style="font-size:13px;color:#8878BB;font-weight:600;margin-bottom:8px">שעות התזכורת:</div>
-      <div class="slots-wrap" id="rem-slots">
-        <div class="slot-row">
-          <input type="time" value="08:00">
-          <button class="slot-remove" onclick="removeSlot(this)">×</button>
-        </div>
+    <p class="sub">קבלו תזכורת כל יום ב-10:00 וב-20:00</p>
+    <button class="rem-submit" id="rem-btn" onclick="subscribeReminders()">
+      <span>🔔</span><span>הפעל תזכורות</span>
+    </button>
+    <div class="rem-done" id="rem-done" style="flex-direction:column;align-items:flex-end;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        ✅ מעולה! תקבלו תזכורת ב-10:00 וב-20:00 כל יום
+        <button onclick="cancelReminder()" style="background:none;border:1.5px solid rgba(239,68,68,.3);color:#DC2626;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;font-family:Heebo,sans-serif;cursor:pointer">ביטול</button>
       </div>
-      <button class="add-slot-btn" onclick="addSlot()">+ הוסף שעה נוספת</button>
+      <div style="font-size:12px;color:#8878BB">אם לא מקבלים התראות — בדקו שהתראות מותרות בהגדרות הדפדפן</div>
     </div>
-  </div>
-
-  <div class="sound-row">
-    <input type="checkbox" id="rem-sound" checked>
-    <label for="rem-sound">🔊 עם צליל</label>
-  </div>
-
-  <button class="rem-submit" id="rem-btn" onclick="subscribeReminders()">
-    <span>🔔</span><span>הפעל תזכורות</span>
-  </button>
-  <div class="rem-done" id="rem-done" style="flex-direction:column;align-items:flex-end;gap:8px">
-    <div style="display:flex;align-items:center;gap:8px">
-      ✅ מעולה! תקבלו תזכורות לאמירת מזמור לתודה
-      <button onclick="cancelReminder()" style="background:none;border:1.5px solid rgba(239,68,68,.3);color:#DC2626;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;font-family:Heebo,sans-serif;cursor:pointer">ביטול</button>
-    </div>
-    <div id="rem-saved-info" style="font-size:12px;color:#8878BB;text-align:right"></div>
-    <div style="font-size:12px;color:#8878BB">אם לא מקבלים התראות — בדקו שהתראות מותרות בהגדרות הדפדפן ובהגדרות המחשב/טלפון</div>
-  </div>
   </div>
 </div>
 <div class="share-card">
@@ -793,31 +751,42 @@ db.channel('public:settings').on('postgres_changes',{event:'UPDATE',schema:'publ
 
 
 // ── Reminders ──
-let remFreq = null;
-
-function selFreq(freq, btn) {
-  remFreq = freq;
-  document.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('rem-time-row').classList.toggle('show', freq==='once'||freq==='three');
-  document.getElementById('rem-custom').classList.toggle('show', freq==='custom');
-}
-
-function addSlot() {
-  const wrap = document.getElementById('rem-slots');
-  const div = document.createElement('div');
-  div.className = 'slot-row';
-  div.innerHTML = '<input type="time" value="12:00" style="border:1.5px solid rgba(109,77,255,.2);border-radius:8px;padding:6px 10px;font-family:Heebo,sans-serif;font-size:14px;color:#1A1333;background:#F4F2FF"><button class="slot-remove" onclick="removeSlot(this)">×</button>';
-  wrap.appendChild(div);
-}
-
-function removeSlot(btn) {
-  const wrap = document.getElementById('rem-slots');
-  if(wrap.children.length > 1) btn.parentElement.remove();
-}
-
 async function subscribeReminders() {
-  if(!remFreq) { toast('בחרו תדירות תזכורת'); return; }
+  const btn = document.getElementById('rem-btn');
+  btn.innerHTML = '<span>⏳</span><span>מפעיל...</span>';
+  btn.disabled = true;
+  try {
+    await new Promise((res, rej) => {
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        try {
+          const granted = await OneSignal.Notifications.requestPermission();
+          if(!granted) { rej(new Error('denied')); return; }
+          let subId = null;
+          try { subId = await OneSignal.User.PushSubscription.id; } catch(e2) {}
+          await db.from('reminders').upsert({
+            uid: myId,
+            onesignal_id: subId || myId,
+            freq: 'fixed',
+            times: '10:00,20:00',
+            days: '1',
+            sound: '1',
+            active: true
+          });
+          localStorage.setItem('rem_active', '1');
+          res();
+        } catch(e) { rej(e); }
+      });
+    });
+    document.getElementById('rem-btn').style.display = 'none';
+    document.getElementById('rem-done').style.display = 'flex';
+    toast('🔔 התזכורות הופעלו!');
+  } catch(e) {
+    toast('לא אושר — ניתן לשנות בהגדרות הדפדפן');
+    btn.innerHTML = '<span>🔔</span><span>הפעל תזכורות</span>';
+    btn.disabled = false;
+  }
+}
   const btn = document.getElementById('rem-btn');
   btn.innerHTML = '<span>⏳</span><span>מפעיל...</span>';
   btn.disabled = true;
@@ -899,14 +868,9 @@ function cancelReminder() {
 }
 
 // restore if already subscribed
-const savedPrefs = JSON.parse(localStorage.getItem('rem_prefs') || 'null');
-if(localStorage.getItem('rem_active') && savedPrefs) {
+if(localStorage.getItem('rem_active')) {
   document.getElementById('rem-btn').style.display = 'none';
   document.getElementById('rem-done').style.display = 'flex';
-  // show saved info
-  const freqLabel = {'once':'פעם ביום','three':'3 פעמים ביום','random':'שעה רנדומלית','custom':'בחירה חופשית'};
-  const info = document.getElementById('rem-saved-info');
-  if(info) info.textContent = '⏰ ' + (freqLabel[savedPrefs.freq]||savedPrefs.freq) + ' | ' + savedPrefs.times;
 }
 function scrollToReminder() {
   const el = document.getElementById('rem-card');
@@ -974,8 +938,8 @@ function isShabbat() {
   const hour = now.getHours();
   const min = now.getMinutes();
   const timeNum = hour * 60 + min;
-  const shabbatStart = 17 * 60; // 17:00
-  const shabbatEnd   = 19 * 60; // 19:00 (מוצ"ש)
+  const shabbatStart = 18 * 60; // 18:00
+  const shabbatEnd   = 20 * 60; // 20:00 (מוצ"ש)
   if (day === 5 && timeNum >= shabbatStart) return true;
   if (day === 6 && timeNum < shabbatEnd)   return true;
   return false;
