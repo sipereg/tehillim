@@ -762,11 +762,20 @@ async function subscribeReminders() {
         try {
           const granted = await OneSignal.Notifications.requestPermission();
           if(!granted) { rej(new Error('denied')); return; }
+          // מחכים לUUID תקני מ-OneSignal (עד 5 שניות)
+          const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
           let subId = null;
-          try { subId = await OneSignal.User.PushSubscription.id; } catch(e2) {}
+          for (let i = 0; i < 10; i++) {
+            try {
+              const candidate = await OneSignal.User.PushSubscription.id;
+              if (candidate && UUID_RE.test(candidate)) { subId = candidate; break; }
+            } catch(e2) {}
+            await new Promise(r => setTimeout(r, 500));
+          }
+          if (!subId) { rej(new Error('no_valid_subscription_id')); return; }
           await db.from('reminders').upsert({
             uid: myId,
-            onesignal_id: subId || myId,
+            onesignal_id: subId,
             freq: 'fixed',
             times: '10:00,20:00',
             days: '1',
