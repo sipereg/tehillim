@@ -654,7 +654,7 @@ function renderRefTable(refs) {
     return;
   }
   const rows = refs.map(([ref,count])=>
-    `<tr><td>${ref==='direct'?'ישיר':ref}</td><td style="text-align:center;font-weight:700;color:#5B3FE8">${count}</td></tr>`
+    `<tr><td>${ref==='direct'?'ישיר':ref}</td><td style="text-align:center;font-weight:700;color:#5B3FE8">${fmtNum(count)}</td></tr>`
   ).join('');
   el.innerHTML=`<table class="ref-table-inner"><thead><tr><th>מפרסם</th><th style="text-align:center">קריאות</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
@@ -746,7 +746,27 @@ async function saveRead(uid, ref, retryCount) {
   }
 }
 
+let lastReadTime = 0;
+const READ_COOLDOWN = 10000;
+
 async function markRead() {
+  const now = Date.now();
+  if (now - lastReadTime < READ_COOLDOWN) {
+    const remaining = Math.ceil((READ_COOLDOWN - (now - lastReadTime)) / 1000);
+    toast(`המתינו עוד ${remaining} שניות לפני קריאה נוספת`);
+    return;
+  }
+  lastReadTime = now;
+  // חסום כפתור "קראתי שוב" זמנית
+  const againBtn = document.getElementById('again-btn');
+  if (againBtn) {
+    againBtn.disabled = true;
+    againBtn.style.opacity = '0.4';
+    setTimeout(() => {
+      againBtn.disabled = false;
+      againBtn.style.opacity = '1';
+    }, READ_COOLDOWN);
+  }
   // optimistic update
   myReads++;
   shared.total = (shared.total || 0) + 1;
