@@ -281,6 +281,7 @@ body.dark #milestone-bar div{color:#C4B8E8}
   .big-num{font-size:clamp(28px,9vw,48px)}
   .circ-outer{width:220px;height:220px}
 }
+.rem-card{background:#FFFFFF;border:1.5px solid rgba(109,77,255,.12);border-radius:20px;padding:22px 24px;margin-bottom:22px;box-shadow:0 4px 16px rgba(109,77,255,.07)}
 </style>
 <script>
 // Register OneSignal service worker via CDN
@@ -433,15 +434,34 @@ if('serviceWorker' in navigator) {
 <div class="ref-card">
   <div class="ref-card-title">🔗 צור לינק אישי</div>
   <div class="ref-card-sub">פרסמו לינק אישי וראו כמה אנשים הגיעו בזכותכם</div>
+
+  <div style="font-size:14px;font-weight:600;color:#3D3060;margin-bottom:8px;text-align:right">הכנס שם קצר או כינוי (בעברית או באנגלית)</div>
   <div class="ref-input-row">
-    <input type="text" class="ref-input" id="my-ref-name" placeholder="הכניסו שם (למשל: שרה)" maxlength="20">
-    <button class="ref-create-btn" onclick="createMyLink()">צור לינק</button>
+    <input type="text" class="ref-input" id="my-ref-name" placeholder="שם קצר או כינוי" maxlength="20">
+    <button class="ref-create-btn" id="ref-create-btn" onclick="handleRefBtn()">צור / טען</button>
   </div>
+  <div style="font-size:12px;color:#8878BB;margin-bottom:12px;text-align:right">כל עוד לא ניקיתם קאש — הנתונים יופיעו אוטומטית. אם עברתם למכשיר אחר — הכנס שם + קוד גישה.</div>
+
+  <div id="my-ref-code-ask" style="display:none;background:rgba(91,63,232,.05);border:1.5px solid rgba(91,63,232,.15);border-radius:10px;padding:12px;margin-bottom:12px">
+    <div style="font-size:13px;color:#3D3060;margin-bottom:8px;text-align:right">השם קיים — הכנס קוד גישה לצפייה בנתונים:</div>
+    <div style="display:flex;gap:8px">
+      <input type="text" class="ref-input" id="my-ref-code-input" placeholder="קוד גישה (6 ספרות)" maxlength="6" style="text-align:center;letter-spacing:3px;font-size:18px;font-weight:700">
+      <button class="ref-create-btn" onclick="verifyCode()">אישור</button>
+    </div>
+  </div>
+
   <div class="ref-result" id="my-ref-result">
-    <div class="ref-result-label">הלינק האישי שלכם:</div>
+    <div class="ref-result-label">✨ הלינק שלכם — העתיקו ושתפו!</div>
     <div class="ref-result-link" id="my-ref-link-text"></div>
     <button class="ref-copy-btn" onclick="copyMyLink()">📋 העתק לינק לשיתוף</button>
+    <div id="my-ref-code-box" style="display:none;margin-top:12px;background:rgba(245,158,11,.08);border:1.5px solid rgba(245,158,11,.3);border-radius:10px;padding:12px;text-align:center">
+      <div style="font-size:12px;color:#8878BB;margin-bottom:4px">קוד הגישה האישי שלכם</div>
+      <div style="font-size:30px;font-weight:800;color:#B45309;letter-spacing:8px" id="my-ref-code-display"></div>
+      <div style="font-size:11px;color:#92400E;margin-top:4px;margin-bottom:8px">שמרו אותו — תצטרכו אותו אם תחליפו מכשיר או תנקו קאש</div>
+      <button onclick="copyRefCode()" style="background:#B45309;color:#FFFFFF;border:none;border-radius:8px;padding:6px 16px;font-size:13px;font-weight:700;font-family:Heebo,sans-serif;cursor:pointer">📋 העתק קוד</button>
+    </div>
   </div>
+
   <div class="ref-stats-box" id="my-ref-stats">
     <div class="ref-stats-title">📊 הסטטיסטיקות שלכם</div>
     <div class="ref-stats-grid">
@@ -504,7 +524,8 @@ if('serviceWorker' in navigator) {
     <p style="margin-bottom:6px">• <strong>תזכורות</strong> — אם בחרתם לקבל תזכורות, נעשה שימוש בשירות <strong>OneSignal</strong> לצורך שליחת התראות דרך הדפדפן. OneSignal מקבל מזהה טכני של המכשיר בלבד, ללא פרטים אישיים.</p>
     <p style="margin-bottom:6px">• <strong>עוגיות</strong> — האתר אינו משתמש בעוגיות (cookies) לצורכי פרסום או מעקב. נעשה שימוש ב-localStorage בדפדפן לשמירת ההעדפות שלכם באופן מקומי בלבד.</p>
     <p style="margin-bottom:6px">• <strong>מנועי חיפוש</strong> — האתר מאנדקס על ידי Google לצורך הופעה בתוצאות חיפוש. Google עשויה לאסוף מידע טכני בעת סריקת האתר בהתאם למדיניות הפרטיות שלה.</p>
-    <p style="margin-bottom:0px">• <strong>שיתוף מידע</strong> — לא מועבר שום מידע אישי לצדדים שלישיים למטרות מסחריות. השירותים החיצוניים משמשים לתפעול המיזם בלבד.</p>
+    <p style="margin-bottom:6px">• <strong>שיתוף מידע</strong> — לא מועבר שום מידע אישי לצדדים שלישיים למטרות מסחריות. השירותים החיצוניים משמשים לתפעול המיזם בלבד.</p>
+    <p style="margin-bottom:0px">• <strong>לינקים אישיים</strong> — אם בחרתם ליצור לינק אישי, השם או הכינוי שבחרתם נשמר בשרת לצורך מעקב אחר מספר הקריאות שהגיעו דרך הלינק שלכם. הנתונים מוגנים בקוד גישה אישי שנוצר בעת יצירת הלינק. לא נשמר שום מידע מזהה אישי נוסף.</p>
   </div>
 </div>
 </div>
@@ -792,20 +813,97 @@ function shareWA(){const msg=`🙏 *${shared.title}*\n${shared.subtitle}\n\nכב
 function copyLink(){const btn=document.getElementById('cp-btn');try{navigator.clipboard.writeText(location.href);btn.textContent='✓ הועתק';setTimeout(()=>btn.textContent='🔗 העתק קישור',2000);toast('הקישור הועתק ✓');}catch(e){toast('העתק את הכתובת מהדפדפן');}}
 
 let myRefValue = '';
+let pendingRef = '';
 
-function createMyLink() {
+function generateCode() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+async function handleRefBtn() {
   const name = document.getElementById('my-ref-name').value.trim();
-  if (!name) { toast('יש להכניס שם'); return; }
+  if (!name) { toast('יש להכניס שם או כינוי'); return; }
   const ref = name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_\u0590-\u05FF]/g, '');
   if (!ref) { toast('שם לא תקין'); return; }
+
+  const btn = document.getElementById('ref-create-btn');
+  btn.textContent = 'בודק...';
+  btn.disabled = true;
+
+  // אם יש localStorage — טען ישירות
+  const savedRef = localStorage.getItem('my_ref');
+  const savedCode = localStorage.getItem('my_ref_code');
+  if (savedRef === ref && savedCode) {
+    showMyLink(ref, savedCode, false);
+    loadMyRefStats(ref);
+    btn.textContent = 'צור / טען';
+    btn.disabled = false;
+    return;
+  }
+
+  try {
+    const { data: existing } = await db.from('refs').select('ref,code').eq('ref', ref).maybeSingle();
+    if (existing) {
+      // השם קיים — בקש קוד
+      pendingRef = ref;
+      document.getElementById('my-ref-code-ask').style.display = 'block';
+      document.getElementById('my-ref-code-input').focus();
+    } else {
+      // שם חדש — צור
+      const code = generateCode();
+      await db.from('refs').insert({ ref, name, code });
+      localStorage.setItem('my_ref', ref);
+      localStorage.setItem('my_ref_code', code);
+      showMyLink(ref, code, true);
+      loadMyRefStats(ref);
+      toast('הלינק נוצר בהצלחה! ✓');
+    }
+  } catch(e) {
+    const code = generateCode();
+    localStorage.setItem('my_ref', ref);
+    localStorage.setItem('my_ref_code', code);
+    showMyLink(ref, code, true);
+    loadMyRefStats(ref);
+  }
+
+  btn.textContent = 'צור / טען';
+  btn.disabled = false;
+}
+
+async function verifyCode() {
+  const code = document.getElementById('my-ref-code-input').value.trim();
+  if (!code) { toast('יש להכניס קוד גישה'); return; }
+  try {
+    const { data } = await db.from('refs').select('ref,code').eq('ref', pendingRef).maybeSingle();
+    if (!data || data.code !== code) { toast('קוד גישה שגוי'); return; }
+    localStorage.setItem('my_ref', pendingRef);
+    localStorage.setItem('my_ref_code', code);
+    document.getElementById('my-ref-code-ask').style.display = 'none';
+    showMyLink(pendingRef, null, false);
+    loadMyRefStats(pendingRef);
+    toast('הנתונים נטענו ✓');
+  } catch(e) { toast('שגיאה — נסו שוב'); }
+}
+
+function showMyLink(ref, code, isNew) {
   myRefValue = ref;
   const link = `https://todahtehillim.netlify.app/?ref=${encodeURIComponent(ref)}`;
   document.getElementById('my-ref-link-text').textContent = link;
   document.getElementById('my-ref-result').style.display = 'block';
   document.getElementById('my-ref-link-display').textContent = `?ref=${ref}`;
   document.getElementById('my-ref-link-display').href = link;
-  localStorage.setItem('my_ref', ref);
-  loadMyRefStats(ref);
+  const codeBox = document.getElementById('my-ref-code-box');
+  const displayCode = code || localStorage.getItem('my_ref_code');
+  if (displayCode) {
+    document.getElementById('my-ref-code-display').textContent = displayCode;
+    codeBox.style.display = 'block';
+  } else {
+    codeBox.style.display = 'none';
+  }
+}
+
+function copyRefCode() {
+  const code = document.getElementById('my-ref-code-display').textContent;
+  navigator.clipboard.writeText(code).then(() => toast('הקוד הועתק! ✓')).catch(() => toast('העתק ידנית'));
 }
 
 function copyMyLink() {
@@ -815,29 +913,30 @@ function copyMyLink() {
 
 async function loadMyRefStats(ref) {
   try {
-    const { data } = await db.from('reads')
-      .select('uid')
-      .eq('ref', ref);
-    if (data) {
-      const total = data.length;
-      const uniq = new Set(data.map(r => r.uid)).size;
-      document.getElementById('my-ref-reads').textContent = fmtNum(total);
-      document.getElementById('my-ref-uniq').textContent = fmtNum(uniq);
-      document.getElementById('my-ref-stats').style.display = 'block';
+    let allData = [];
+    let from = 0;
+    const pageSize = 1000;
+    while (true) {
+      const { data } = await db.from('reads').select('uid').eq('ref', ref).range(from, from + pageSize - 1);
+      if (!data || data.length === 0) break;
+      allData = allData.concat(data);
+      if (data.length < pageSize) break;
+      from += pageSize;
     }
+    const total = allData.length;
+    const uniq = new Set(allData.map(r => r.uid)).size;
+    document.getElementById('my-ref-reads').textContent = fmtNum(total);
+    document.getElementById('my-ref-uniq').textContent = fmtNum(uniq);
+    document.getElementById('my-ref-stats').style.display = 'block';
   } catch(e) {}
 }
 
 // restore saved ref on load
 const savedRef = localStorage.getItem('my_ref');
-if (savedRef) {
+const savedCode = localStorage.getItem('my_ref_code');
+if (savedRef && savedCode) {
   document.getElementById('my-ref-name').value = savedRef.replace(/_/g, ' ');
-  myRefValue = savedRef;
-  const link = `https://todahtehillim.netlify.app/?ref=${encodeURIComponent(savedRef)}`;
-  document.getElementById('my-ref-link-text').textContent = link;
-  document.getElementById('my-ref-result').style.display = 'block';
-  document.getElementById('my-ref-link-display').textContent = `?ref=${savedRef}`;
-  document.getElementById('my-ref-link-display').href = link;
+  showMyLink(savedRef, null, false);
   loadMyRefStats(savedRef);
 }
 function openModal(){document.getElementById('modal').classList.add('open');document.getElementById('mpass').value='';setTimeout(()=>document.getElementById('mpass').focus(),80);}
