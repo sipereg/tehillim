@@ -843,20 +843,12 @@ async function handleRefBtn() {
   try {
     const { data: existing } = await db.from('refs').select('ref,code').eq('ref', ref).maybeSingle();
     if (existing) {
-      if (!existing.code) {
-        // נרשם לפני מערכת הקוד — גישה חופשית
-        localStorage.setItem('my_ref', ref);
-        showMyLink(ref, null, false);
-        loadMyRefStats(ref);
-        toast('הנתונים נטענו ✓');
-      } else {
-        // השם קיים עם קוד — בקש קוד
-        pendingRef = ref;
-        document.getElementById('my-ref-code-ask').style.display = 'block';
-        document.getElementById('my-ref-code-ask').querySelector('div').textContent = `השם "${name}" כבר קיים — אם זה הלינק שלך הכנס קוד גישה. אחרת בחר שם אחר.`;
-        document.getElementById('my-ref-code-input').focus();
-        toast('השם "' + name + '" כבר תפוס — הכנס קוד גישה או בחר שם אחר');
-      }
+      // השם קיים — בקש קוד
+      pendingRef = ref;
+      document.getElementById('my-ref-code-ask').style.display = 'block';
+      document.getElementById('my-ref-code-ask').querySelector('div').textContent = `השם "${name}" כבר קיים — אם זה הלינק שלך הכנס קוד גישה. אחרת בחר שם אחר.`;
+      document.getElementById('my-ref-code-input').focus();
+      toast('השם "' + name + '" כבר תפוס — הכנס קוד גישה או בחר שם אחר');
     } else {
       // שם חדש — צור
       const code = generateCode();
