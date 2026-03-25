@@ -846,7 +846,9 @@ async function handleRefBtn() {
       // השם קיים — בקש קוד
       pendingRef = ref;
       document.getElementById('my-ref-code-ask').style.display = 'block';
+      document.getElementById('my-ref-code-ask').querySelector('div').textContent = `השם "${name}" כבר קיים — אם זה הלינק שלך הכנס קוד גישה. אחרת בחר שם אחר.`;
       document.getElementById('my-ref-code-input').focus();
+      toast('השם "' + name + '" כבר תפוס — הכנס קוד גישה או בחר שם אחר');
     } else {
       // שם חדש — צור
       const code = generateCode();
