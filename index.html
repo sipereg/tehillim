@@ -721,7 +721,15 @@ async function saveRead(uid, ref, retryCount) {
   if (BLOCKED_UIDS.includes(uid)) return false;
   retryCount = retryCount || 0;
   try {
-    const token = await grecaptcha.execute('6LeJY5gsAAAAAH5-xQyLLoYnc4wFfGW8m2rO0uAg', { action: 'read' });
+    const token = await new Promise((resolve, reject) => {
+      if (typeof grecaptcha === 'undefined') { reject(new Error('recaptcha not loaded')); return; }
+      grecaptcha.ready(async () => {
+        try {
+          const t = await grecaptcha.execute('6LeJY5gsAAAAAH5-xQyLLoYnc4wFfGW8m2rO0uAg', { action: 'read' });
+          resolve(t);
+        } catch(e) { reject(e); }
+      });
+    });
     const res = await fetch('/.netlify/functions/save-read', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -731,7 +739,14 @@ async function saveRead(uid, ref, retryCount) {
     while(pendingReads.length > 0) {
       const p = pendingReads[0];
       try {
-        const t2 = await grecaptcha.execute('6LeJY5gsAAAAAH5-xQyLLoYnc4wFfGW8m2rO0uAg', { action: 'read' });
+        const t2 = await new Promise((resolve, reject) => {
+          grecaptcha.ready(async () => {
+            try {
+              const t = await grecaptcha.execute('6LeJY5gsAAAAAH5-xQyLLoYnc4wFfGW8m2rO0uAg', { action: 'read' });
+              resolve(t);
+            } catch(e) { reject(e); }
+          });
+        });
         await fetch('/.netlify/functions/save-read', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
