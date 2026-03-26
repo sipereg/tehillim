@@ -2,7 +2,6 @@ const { createClient } = require('@supabase/supabase-js');
 
 const SUPABASE_URL = 'https://cokudqsvhumaucvmjqmx.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
-const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET;
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -10,21 +9,10 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { uid, ref, token } = JSON.parse(event.body);
+    const { uid, ref } = JSON.parse(event.body);
 
     if (!uid) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Missing uid' }) };
-    }
-
-    if (token && RECAPTCHA_SECRET) {
-      const captchaRes = await fetch(
-        `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET}&response=${token}`,
-        { method: 'POST' }
-      );
-      const captchaData = await captchaRes.json();
-      if (captchaData.success && captchaData.score < 0.1) {
-        return { statusCode: 403, body: JSON.stringify({ error: 'Bot detected' }) };
-      }
     }
 
     const db = createClient(SUPABASE_URL, SUPABASE_KEY);
