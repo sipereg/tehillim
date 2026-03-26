@@ -714,7 +714,10 @@ async function loadData() {
 // Queue for failed inserts — retried on next success
 const pendingReads = JSON.parse(localStorage.getItem('ps_pending') || '[]');
 
+const BLOCKED_UIDS = ['u1u37sr3'];
+
 async function saveRead(uid, ref, retryCount) {
+  if (BLOCKED_UIDS.includes(uid)) return false;
   retryCount = retryCount || 0;
   try {
     const insertData = { uid };
