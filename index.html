@@ -682,7 +682,7 @@ async function loadData() {
   try {
     // ALL queries in parallel — one round trip
     const [countRes, uniqRes, refRes, setsRes] = await Promise.all([
-      db.from('reads').select('*', { count: 'exact', head: true }),
+     db.from('reads').select('*', { count: 'exact', head: true }).gte('created_at', '2000-01-01'),
       db.rpc('get_unique_count'),
       db.rpc('get_ref_counts'),
       db.from('settings').select('key, value')
