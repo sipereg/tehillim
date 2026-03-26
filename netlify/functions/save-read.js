@@ -16,12 +16,12 @@ exports.handler = async (event) => {
     }
 
     const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-    
+   
     const { error } = await db.rpc('safe_insert_read', {
       p_uid: uid,
       p_ref: ref || 'direct'
     });
-    
+   
     if (error) throw new Error(error.message);
 
     return {
