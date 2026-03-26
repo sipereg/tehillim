@@ -2,18 +2,32 @@ const { createClient } = require('@supabase/supabase-js');
 
 const SUPABASE_URL = 'https://cokudqsvhumaucvmjqmx.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
+const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET;
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
   try {
-    const { uid, ref } = JSON.parse(event.body);
+    const { uid, ref, token } = JSON.parse(event.body);
+
+    if (RECAPTCHA_SECRET && token) {
+      const captchaRes = await fetch(
+        `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET}&response=${token}`,
+        { method: 'POST' }
+      );
+      const captchaData = await captchaRes.json();
+      if (!captchaData.success || captchaData.score < 0.3) {
+        return { statusCode: 403, body: JSON.stringify({ error: 'bot detected' }) };
+      }
+    }
+
     const db = createClient(SUPABASE_URL, SUPABASE_KEY);
     const insertData = { uid };
     if (ref) insertData.ref = ref;
     const { error } = await db.from('reads').insert(insertData);
     if (error) throw new Error(error.message);
+
     return {
       statusCode: 200,
       body: JSON.stringify({ success: true })
