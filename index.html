@@ -676,9 +676,7 @@ function copyRefLink(){
 
 async function loadData() {
   // retry any pending reads
-  if(pendingReads && pendingReads.length > 0) {
-    saveRead(pendingReads[0].uid, pendingReads[0].ref, 0);
-  }
+ // pending reads disabled
   try {
     // ALL queries in parallel — one round trip
     const [countRes, uniqRes, refRes, setsRes] = await Promise.all([
