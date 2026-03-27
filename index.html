@@ -866,6 +866,15 @@ async function handleRefBtn() {
   const ref = name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_\u0590-\u05FF]/g, '');
   if (!ref) { toast('שם לא תקין'); return; }
 
+  const BLOCKED_REFS = ['Italy','France','Germany','UK','Canada','Brazil','Japan','USA',
+    'North Korea','Vatican','China','Russia','Australia','Spain','India',
+    'Mexico','Argentina','Poland','Sweden','Norway','M5_PRO_BYPASS'];
+  if (BLOCKED_REFS.includes(ref)) {
+    toast('❌ השם "' + name + '" אינו זמין — אנא בחר שם אחר');
+    btn.textContent = 'צור / טען';
+    btn.disabled = false;
+    return;
+  }
   const btn = document.getElementById('ref-create-btn');
   btn.textContent = 'בודק...';
   btn.disabled = true;
