@@ -1147,17 +1147,38 @@ function launchFireworks() {
   }
 }
 
-// ── שבת ──
+// ── שבת וחגים ──
 function isShabbat() {
   const now = new Date();
-  const day = now.getDay(); // 5=שישי, 6=שבת
+  const day = now.getDay();
   const hour = now.getHours();
   const min = now.getMinutes();
   const timeNum = hour * 60 + min;
-  const shabbatStart = 18 * 60; // 18:00
-  const shabbatEnd   = 20 * 60; // 20:00 (מוצ"ש)
+  const shabbatStart = 18 * 60;
+  const shabbatEnd   = 20 * 60 + 34;
+
   if (day === 5 && timeNum >= shabbatStart) return true;
   if (day === 6 && timeNum < shabbatEnd)   return true;
+
+  const dateStr = now.toISOString().slice(0, 10);
+  const holidays = [
+    '2026-04-01','2026-04-02',
+    '2026-04-07','2026-04-08',
+    '2026-05-21','2026-05-22',
+    '2026-09-10','2026-09-11','2026-09-12',
+    '2026-09-19','2026-09-20',
+    '2026-09-24','2026-09-25',
+    '2026-10-01','2026-10-02',
+    '2027-03-21','2027-03-22',
+    '2027-03-27','2027-03-28',
+  ];
+
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().slice(0, 10);
+  if (holidays.includes(tomorrowStr) && timeNum >= shabbatStart) return true;
+  if (holidays.includes(dateStr) && timeNum < shabbatEnd) return true;
+
   return false;
 }
 
