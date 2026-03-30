@@ -420,6 +420,15 @@ if('serviceWorker' in navigator) {
     <span class="vn">ה</span>כִּי טוֹב יְהוָה, לְעוֹלָם חַסְדּוֹ; וְעַד־דֹּר וָדֹר, אֱמוּנָתוֹ.
   </div>
 
+  <!-- כפתור קריאה — מוצג רק בשפה זרה, אחרי הפסוקים העבריים -->
+  <div id="cta-inline" style="display:none;text-align:center;margin:20px 0 4px">
+    <div class="note" id="note-inline" style="font-size:15px;color:#8878BB;margin-bottom:10px;display:none"></div>
+    <button class="main-btn" id="main-btn-inline" onclick="markRead()" style="font-size:17px;padding:14px 40px">
+      <span>✓</span><span id="btn-txt-inline">I said the Psalm</span>
+    </button><br>
+    <button class="again-btn" id="again-btn-inline" onclick="markRead()" style="margin-top:10px">↺ Read again</button>
+  </div>
+
   <!-- תעתיק + תרגום — מוצג רק בשפה זרה -->
   <div id="psalm-translation" style="display:none;margin-top:20px;border-top:1px solid rgba(109,77,255,.1);padding-top:16px">
     <div class="psalm-verse-block">
@@ -719,6 +728,11 @@ function renderDOM() {
     if (againBtn) againBtn.textContent = t ? t.btnAgain : '↺ קראתי שוב';
     const noteEl = document.getElementById('note');
     if (noteEl) noteEl.innerHTML = t ? t.myReadsNote(myReads) : 'קראת <b id="my-n">' + myReads + '</b> פעמים — יישר כוח! 🙏';
+    // inline button
+    const btnTxtInline = document.getElementById('btn-txt-inline'); if (btnTxtInline) btnTxtInline.textContent = t ? t.btnAgain : 'קראתי שוב';
+    const mainBtnInline = document.getElementById('main-btn-inline'); if (mainBtnInline) mainBtnInline.classList.add('done');
+    const againBtnInline = document.getElementById('again-btn-inline'); if (againBtnInline) { againBtnInline.style.display = 'inline-flex'; againBtnInline.textContent = t ? t.btnAgain : '↺ קראתי שוב'; }
+    const noteInline = document.getElementById('note-inline'); if (noteInline) { noteInline.innerHTML = t ? t.myReadsNote(myReads) : 'קראת <b>' + myReads + '</b> פעמים — יישר כוח! 🙏'; noteInline.style.display = 'block'; }
   }
   document.body.classList.toggle('dark', dark);
   document.getElementById('theme-btn').textContent = dark ? '☀️' : '🌙';
@@ -1412,6 +1426,11 @@ function applyLang() {
 
   const transEl = document.getElementById('psalm-translation');
   if (transEl) transEl.style.display = isHe ? 'none' : 'block';
+  const ctaInline = document.getElementById('cta-inline');
+  if (ctaInline) ctaInline.style.display = isHe ? 'none' : 'block';
+  // הסתר את הכפתור הרגיל בשפה זרה
+  const ctaArea = document.querySelector('.cta-area');
+  if (ctaArea) ctaArea.style.display = isHe ? 'block' : 'none';
   document.documentElement.dir = isHe ? 'rtl' : 'ltr';
   document.documentElement.lang = currentLang;
 
@@ -1440,6 +1459,13 @@ function applyLang() {
     set('pg-title', t.pageTitle);
     set('pg-sub', t.pageSub);
     const btnTxt = document.getElementById('btn-txt'); if (btnTxt) btnTxt.textContent = myReads > 0 ? t.btnAgain : t.btnText;
+    const btnTxtInline = document.getElementById('btn-txt-inline'); if (btnTxtInline) btnTxtInline.textContent = myReads > 0 ? t.btnAgain : t.btnText;
+    const againBtnInline = document.getElementById('again-btn-inline'); if (againBtnInline) againBtnInline.textContent = t.btnAgain;
+    if (myReads > 0) {
+      const mainBtnInline = document.getElementById('main-btn-inline'); if (mainBtnInline) mainBtnInline.classList.add('done');
+      const againBtnInlineEl = document.getElementById('again-btn-inline'); if (againBtnInlineEl) againBtnInlineEl.style.display = 'inline-flex';
+      const noteInline = document.getElementById('note-inline'); if (noteInline) { noteInline.innerHTML = t.myReadsNote(myReads); noteInline.style.display = 'block'; }
+    }
     setQ('#again-btn', t.btnAgain);
     const noteEl = document.getElementById('note'); if (noteEl) noteEl.innerHTML = t.myReadsNote(myReads);
     setQHTML('.live-pill', '<div class="ldot"></div>' + t.liveNow);
