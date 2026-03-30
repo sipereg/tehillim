@@ -890,8 +890,8 @@ async function markRead() {
   burst();
   toast(window._toastRead || '🙏 תודה! הפרק נרשם');
   // save to server with retry
- const langSuffix = currentLang !== 'he' ? '_' + currentLang : '';
-const saved = await saveRead(myId, urlRef + langSuffix);
+  const langSuffix = currentLang !== 'he' ? '_' + currentLang : '';
+  const saved = await saveRead(myId, urlRef + langSuffix);
   if(saved) await loadData();
 }
 
@@ -1386,11 +1386,6 @@ function detectLang() {
 }
 
 let currentLang = localStorage.getItem('ps_lang') || detectLang();
-  const bl = (navigator.language || navigator.userLanguage || 'he').toLowerCase();
-  if (bl.startsWith('fr')) return 'fr';
-  if (bl.startsWith('he') || bl.startsWith('iw')) return 'he';
-  return 'en';
-}
 
 function toggleLangMenu() {
   const menu = document.getElementById('lang-menu');
