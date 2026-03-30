@@ -285,13 +285,6 @@ body.dark #milestone-bar div{color:#C4B8E8}
 .rem-card{background:#FFFFFF;border:1.5px solid rgba(109,77,255,.12);border-radius:20px;padding:22px 24px;margin-bottom:22px;box-shadow:0 4px 16px rgba(109,77,255,.07)}
 .lang-btn{background:#FFFFFF;color:#5B3FE8;border:1.5px solid rgba(109,77,255,.2);border-radius:20px;padding:5px 10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif}
 body.dark .lang-btn{background:#1C1830;color:#9B7DFF;border-color:rgba(155,125,255,.3)}
-.lang-wrap{position:relative}
-.lang-menu{position:absolute;top:calc(100% + 6px);left:0;background:#FFFFFF;border:1.5px solid rgba(109,77,255,.2);border-radius:12px;box-shadow:0 8px 24px rgba(109,77,255,.15);min-width:140px;z-index:100;overflow:hidden}
-body.dark .lang-menu{background:#1C1830;border-color:rgba(155,125,255,.3)}
-.lang-opt{padding:10px 16px;font-size:14px;font-weight:600;color:#3D3060;cursor:pointer;transition:background .15s}
-.lang-opt:hover{background:rgba(109,77,255,.07)}
-body.dark .lang-opt{color:#C4B8E8}
-body.dark .lang-opt:hover{background:rgba(155,125,255,.1)}
 .psalm-verse-block{margin-bottom:18px}
 .psalm-transliteration{font-size:13px;font-style:italic;color:#8878BB;margin-bottom:3px;direction:ltr;text-align:left;line-height:1.5}
 body.dark .psalm-transliteration{color:#7A6BA8}
@@ -347,14 +340,7 @@ if('serviceWorker' in navigator) {
     <div class="live-pill"><div class="ldot"></div>חי עכשיו</div>
     <button class="share-btn" onclick="doShare()">⬆ שתף</button>
     <button class="bell-btn" onclick="scrollToReminder()" title="הגדרת תזכורות">🔔</button>
-    <div class="lang-wrap" id="lang-wrap">
-      <button class="lang-btn" id="lang-btn" onclick="toggleLangMenu()">🌐 <span id="lang-label">עב</span> ▾</button>
-      <div class="lang-menu" id="lang-menu" style="display:none">
-        <div class="lang-opt" onclick="setLang('he')">🇮🇱 עברית</div>
-        <div class="lang-opt" onclick="setLang('en')">🇺🇸 English</div>
-        <div class="lang-opt" onclick="setLang('fr')">🇫🇷 Français</div>
-      </div>
-    </div>
+    <button class="lang-btn" id="lang-btn" onclick="cycleLang()">EN</button>
     <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
   </div>
 </div>
@@ -418,15 +404,6 @@ if('serviceWorker' in navigator) {
     <span class="vn">ג</span>דְּעוּ כִּי יְהוָה, הוּא אֱלֹהִים: הוּא עָשָׂנוּ וְלוֹ אֲנַחְנוּ, עַמּוֹ וְצֹאן מַרְעִיתוֹ.<br>
     <span class="vn">ד</span>בֹּאוּ שְׁעָרָיו בְּתוֹדָה, חֲצֵרֹתָיו בִּתְהִלָּה; הוֹדוּ לוֹ, בָּרְכוּ שְׁמוֹ.<br>
     <span class="vn">ה</span>כִּי טוֹב יְהוָה, לְעוֹלָם חַסְדּוֹ; וְעַד־דֹּר וָדֹר, אֱמוּנָתוֹ.
-  </div>
-
-  <!-- כפתור קריאה — מוצג רק בשפה זרה, אחרי הפסוקים העבריים -->
-  <div id="cta-inline" style="display:none;text-align:center;margin:20px 0 4px">
-    <div class="note" id="note-inline" style="font-size:15px;color:#8878BB;margin-bottom:10px;display:none"></div>
-    <button class="main-btn" id="main-btn-inline" onclick="markRead()" style="font-size:17px;padding:14px 40px">
-      <span>✓</span><span id="btn-txt-inline">I said the Psalm</span>
-    </button><br>
-    <button class="again-btn" id="again-btn-inline" onclick="markRead()" style="margin-top:10px">↺ Read again</button>
   </div>
 
   <!-- תעתיק + תרגום — מוצג רק בשפה זרה -->
@@ -493,15 +470,15 @@ if('serviceWorker' in navigator) {
   <div class="ref-card-title">🔗 צור לינק אישי</div>
   <div class="ref-card-sub">פרסמו לינק אישי וראו כמה אנשים הגיעו בזכותכם</div>
 
-  <div style="font-size:14px;font-weight:600;color:#3D3060;margin-bottom:8px;text-align:right" id="ref-input-label">הכנס שם קצר או כינוי (בעברית או באנגלית)</div>
+  <div style="font-size:14px;font-weight:600;color:#3D3060;margin-bottom:8px;text-align:right">הכנס שם קצר או כינוי (בעברית או באנגלית)</div>
   <div class="ref-input-row">
     <input type="text" class="ref-input" id="my-ref-name" placeholder="שם קצר או כינוי" maxlength="20">
     <button class="ref-create-btn" id="ref-create-btn" onclick="handleRefBtn()">צור / טען</button>
   </div>
-  <div id="ref-cache-note" style="font-size:12px;color:#8878BB;margin-bottom:12px;text-align:right">כל עוד לא ניקיתם קאש — הנתונים יופיעו אוטומטית. אם עברתם למכשיר אחר — הכנס שם + קוד גישה.</div>
+  <div style="font-size:12px;color:#8878BB;margin-bottom:12px;text-align:right">כל עוד לא ניקיתם קאש — הנתונים יופיעו אוטומטית. אם עברתם למכשיר אחר — הכנס שם + קוד גישה.</div>
 
   <div id="my-ref-code-ask" style="display:none;background:rgba(91,63,232,.05);border:1.5px solid rgba(91,63,232,.15);border-radius:10px;padding:12px;margin-bottom:12px">
-    <div id="ref-code-ask-label" style="font-size:13px;color:#3D3060;margin-bottom:8px;text-align:right">השם קיים — הכנס קוד גישה לצפייה בנתונים:</div>
+    <div style="font-size:13px;color:#3D3060;margin-bottom:8px;text-align:right">השם קיים — הכנס קוד גישה לצפייה בנתונים:</div>
     <div style="display:flex;gap:8px">
       <input type="text" class="ref-input" id="my-ref-code-input" placeholder="קוד גישה (6 ספרות)" maxlength="6" style="text-align:center;letter-spacing:3px;font-size:18px;font-weight:700">
       <button class="ref-create-btn" onclick="verifyCode()">אישור</button>
@@ -572,10 +549,9 @@ if('serviceWorker' in navigator) {
   </div>
 </div>
   <div style="text-align:center;margin-top:10px">
-    <button onclick="togglePrivacy()" id="privacy-btn" style="background:none;border:none;font-size:13px;color:#8878BB;cursor:pointer;font-family:Heebo,sans-serif;text-decoration:underline">מדיניות פרטיות</button>
+    <button onclick="togglePrivacy()" style="background:none;border:none;font-size:13px;color:#8878BB;cursor:pointer;font-family:Heebo,sans-serif;text-decoration:underline">מדיניות פרטיות</button>
   </div>
   <div id="privacy-panel" style="display:none;background:#FFFFFF;border:1.5px solid rgba(109,77,255,.12);border-radius:16px;padding:20px 22px;margin-top:10px;font-size:13px;line-height:2;color:#3D3060;direction:rtl">
-    <div id="privacy-content-he">
     <strong style="font-size:15px;display:block;margin-bottom:10px">מדיניות פרטיות — מיזם המיליון</strong>
     <p style="margin-bottom:8px">אתר זה אוסף מידע מינימלי בלבד לצורך ניהול המיזם:</p>
     <p style="margin-bottom:6px">• <strong>ספירת קריאות</strong> — כל לחיצה על הכפתור נרשמת עם מזהה אקראי אנונימי שנוצר במכשיר שלכם. לא נשמר שום מידע מזהה אישי כגון שם, כתובת אימייל או IP.</p>
@@ -585,29 +561,6 @@ if('serviceWorker' in navigator) {
     <p style="margin-bottom:6px">• <strong>מנועי חיפוש</strong> — האתר מאנדקס על ידי Google לצורך הופעה בתוצאות חיפוש. Google עשויה לאסוף מידע טכני בעת סריקת האתר בהתאם למדיניות הפרטיות שלה.</p>
     <p style="margin-bottom:6px">• <strong>שיתוף מידע</strong> — לא מועבר שום מידע אישי לצדדים שלישיים למטרות מסחריות. השירותים החיצוניים משמשים לתפעול המיזם בלבד.</p>
     <p style="margin-bottom:0px">• <strong>לינקים אישיים</strong> — אם בחרתם ליצור לינק אישי, השם או הכינוי שבחרתם נשמר בשרת לצורך מעקב אחר מספר הקריאות שהגיעו דרך הלינק שלכם. הנתונים מוגנים בקוד גישה אישי שנוצר בעת יצירת הלינק. לא נשמר שום מידע מזהה אישי נוסף.</p>
-    </div>
-    <div id="privacy-content-en" style="display:none;direction:ltr">
-    <strong style="font-size:15px;display:block;margin-bottom:10px">Privacy Policy — The Million Project</strong>
-    <p style="margin-bottom:8px">This site collects minimal information only for the purpose of managing the project:</p>
-    <p style="margin-bottom:6px">• <strong>Reading count</strong> — Every click on the button is recorded with an anonymous random identifier created on your device. No personally identifiable information such as name, email address or IP is stored.</p>
-    <p style="margin-bottom:6px">• <strong>Data storage</strong> — The anonymous identifier and count are stored in <strong>Supabase</strong> (a secure data storage provider). No personally identifiable information is stored.</p>
-    <p style="margin-bottom:6px">• <strong>Reminders</strong> — If you choose to receive reminders, <strong>OneSignal</strong> is used to send browser notifications. OneSignal only receives a technical device identifier, without personal details.</p>
-    <p style="margin-bottom:6px">• <strong>Cookies</strong> — This site does not use cookies for advertising or tracking. localStorage is used to save your preferences locally on your device only.</p>
-    <p style="margin-bottom:6px">• <strong>Search engines</strong> — The site is indexed by Google to appear in search results. Google may collect technical information when crawling the site.</p>
-    <p style="margin-bottom:6px">• <strong>Data sharing</strong> — No personal information is transferred to third parties for commercial purposes. External services are used solely to operate the project.</p>
-    <p style="margin-bottom:0px">• <strong>Personal links</strong> — If you choose to create a personal link, the name or nickname you chose is stored on the server to track the number of readings that came through your link. The data is protected by a personal access code created when the link is created. No additional personally identifiable information is stored.</p>
-    </div>
-    <div id="privacy-content-fr" style="display:none;direction:ltr">
-    <strong style="font-size:15px;display:block;margin-bottom:10px">Politique de confidentialité — Le Projet du Million</strong>
-    <p style="margin-bottom:8px">Ce site collecte un minimum d'informations uniquement pour la gestion du projet:</p>
-    <p style="margin-bottom:6px">• <strong>Comptage des lectures</strong> — Chaque clic sur le bouton est enregistré avec un identifiant anonyme aléatoire créé sur votre appareil. Aucune information personnelle identifiable telle que nom, adresse e-mail ou IP n'est stockée.</p>
-    <p style="margin-bottom:6px">• <strong>Stockage des données</strong> — L'identifiant anonyme et le comptage sont stockés dans <strong>Supabase</strong> (fournisseur de stockage de données sécurisé). Aucune information personnelle identifiable n'est stockée.</p>
-    <p style="margin-bottom:6px">• <strong>Rappels</strong> — Si vous choisissez de recevoir des rappels, <strong>OneSignal</strong> est utilisé pour envoyer des notifications via le navigateur. OneSignal ne reçoit qu'un identifiant technique de l'appareil, sans données personnelles.</p>
-    <p style="margin-bottom:6px">• <strong>Cookies</strong> — Ce site n'utilise pas de cookies à des fins publicitaires ou de suivi. Le localStorage est utilisé pour sauvegarder vos préférences localement sur votre appareil uniquement.</p>
-    <p style="margin-bottom:6px">• <strong>Moteurs de recherche</strong> — Le site est indexé par Google pour apparaître dans les résultats de recherche. Google peut collecter des informations techniques lors de l'exploration du site.</p>
-    <p style="margin-bottom:6px">• <strong>Partage de données</strong> — Aucune information personnelle n'est transmise à des tiers à des fins commerciales. Les services externes sont utilisés uniquement pour faire fonctionner le projet.</p>
-    <p style="margin-bottom:0px">• <strong>Liens personnels</strong> — Si vous choisissez de créer un lien personnel, le nom ou le surnom que vous avez choisi est stocké sur le serveur pour suivre le nombre de lectures venues via votre lien. Les données sont protégées par un code d'accès personnel créé lors de la création du lien. Aucune information personnelle supplémentaire n'est stockée.</p>
-    </div>
   </div>
 </div>
 </div>
@@ -718,21 +671,10 @@ function renderDOM() {
   checkMilestone(shared.total);
   if (myReads > 0) {
     document.getElementById('note').style.display = 'block';
-    const myNEl = document.getElementById('my-n');
-    if (myNEl) myNEl.textContent = myReads;
-    const t = TRANSLATIONS[currentLang];
-    document.getElementById('btn-txt').textContent = t ? t.btnAgain : 'קראתי שוב';
+    document.getElementById('my-n').textContent   = myReads;
+    document.getElementById('btn-txt').textContent = 'קראתי שוב';
     document.getElementById('main-btn').classList.add('done');
     document.getElementById('again-btn').style.display = 'inline-flex';
-    const againBtn = document.getElementById('again-btn');
-    if (againBtn) againBtn.textContent = t ? t.btnAgain : '↺ קראתי שוב';
-    const noteEl = document.getElementById('note');
-    if (noteEl) noteEl.innerHTML = t ? t.myReadsNote(myReads) : 'קראת <b id="my-n">' + myReads + '</b> פעמים — יישר כוח! 🙏';
-    // inline button
-    const btnTxtInline = document.getElementById('btn-txt-inline'); if (btnTxtInline) btnTxtInline.textContent = t ? t.btnAgain : 'קראתי שוב';
-    const mainBtnInline = document.getElementById('main-btn-inline'); if (mainBtnInline) mainBtnInline.classList.add('done');
-    const againBtnInline = document.getElementById('again-btn-inline'); if (againBtnInline) { againBtnInline.style.display = 'inline-flex'; againBtnInline.textContent = t ? t.btnAgain : '↺ קראתי שוב'; }
-    const noteInline = document.getElementById('note-inline'); if (noteInline) { noteInline.innerHTML = t ? t.myReadsNote(myReads) : 'קראת <b>' + myReads + '</b> פעמים — יישר כוח! 🙏'; noteInline.style.display = 'block'; }
   }
   document.body.classList.toggle('dark', dark);
   document.getElementById('theme-btn').textContent = dark ? '☀️' : '🌙';
@@ -888,10 +830,9 @@ async function markRead() {
   localStorage.setItem('ps_my', myReads);
   renderDOM();
   burst();
-  toast(window._toastRead || '🙏 תודה! הפרק נרשם');
+  toast('🙏 תודה! הפרק נרשם');
   // save to server with retry
-  const langSuffix = currentLang !== 'he' ? '_' + currentLang : '';
-  const saved = await saveRead(myId, urlRef + langSuffix);
+  const saved = await saveRead(myId, urlRef);
   if(saved) await loadData();
 }
 
@@ -991,15 +932,14 @@ async function handleRefBtn() {
         localStorage.setItem('my_ref', ref);
         showMyLink(ref, null, false);
         loadMyRefStats(ref);
-        toast((TRANSLATIONS[currentLang]||{}).toastDataLoaded || 'הנתונים נטענו ✓');
+        toast('הנתונים נטענו ✓');
       } else {
         // השם קיים עם קוד — בקש קוד
         pendingRef = ref;
-        const t = TRANSLATIONS[currentLang];
-        document.getElementById('ref-code-ask-label').textContent = t ? t.toastNameExists(name) : `השם "${name}" כבר קיים — אם זה הלינק שלך הכנס קוד גישה. אחרת בחר שם אחר.`;
         document.getElementById('my-ref-code-ask').style.display = 'block';
+        document.getElementById('my-ref-code-ask').querySelector('div').textContent = `השם "${name}" כבר קיים — אם זה הלינק שלך הכנס קוד גישה. אחרת בחר שם אחר.`;
         document.getElementById('my-ref-code-input').focus();
-        toast(t ? t.toastNameTaken(name) : 'השם "' + name + '" כבר תפוס — הכנס קוד גישה או בחר שם אחר');
+        toast('השם "' + name + '" כבר תפוס — הכנס קוד גישה או בחר שם אחר');
       }
     } else {
       // שם חדש — צור
@@ -1009,7 +949,7 @@ async function handleRefBtn() {
       localStorage.setItem('my_ref_code', code);
       showMyLink(ref, code, true);
       loadMyRefStats(ref);
-      toast((TRANSLATIONS[currentLang]||{}).toastLinkCreated || 'הלינק נוצר בהצלחה! ✓');
+      toast('הלינק נוצר בהצלחה! ✓');
     }
   } catch(e) {
     console.error('ref error:', e);
@@ -1031,7 +971,7 @@ async function verifyCode() {
     document.getElementById('my-ref-code-ask').style.display = 'none';
     showMyLink(pendingRef, null, false);
     loadMyRefStats(pendingRef);
-    toast((TRANSLATIONS[currentLang]||{}).toastDataLoaded || 'הנתונים נטענו ✓');
+    toast('הנתונים נטענו ✓');
   } catch(e) { toast('שגיאה — נסו שוב'); }
 }
 
@@ -1105,7 +1045,7 @@ function checkPass(){
   }
 }
 function toast(msg){const t=document.getElementById('toast-el');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'), msg.startsWith('✓') ? 4000 : 3000);}
-function burst(){const fx=document.getElementById('fx'),btn=document.getElementById('main-btn'),r=btn.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;['rgba(91,63,232,.5)','rgba(244,63,142,.4)','rgba(6,182,212,.4)'].forEach((c,i)=>{const ring=document.createElement('div');ring.className='ring';ring.style.cssText=`left:${cx}px;top:${cy}px;width:70px;height:70px;border:2px solid ${c};animation-delay:${i*.14}s`;fx.appendChild(ring);setTimeout(()=>ring.remove(),800);});const cols=['#9B7DFF','#06B6D4','#F43F8E','#F59E0B','#10B981'];for(let i=0;i<24;i++){const p=document.createElement('div');p.className='part';const a=(i/24)*Math.PI*2,d=60+Math.random()*100;p.style.cssText=`left:${cx}px;top:${cy}px;width:${5+Math.random()*7}px;height:${5+Math.random()*7}px;background:${cols[i%5]};--tx:${Math.cos(a)*d}px;--ty:${Math.sin(a)*d}px;animation-delay:${Math.random()*.15}s;border-radius:${Math.random()>.5?'50%':'3px'}`;fx.appendChild(p);setTimeout(()=>p.remove(),1100);}}
+function burst(){const fx=document.getElementById('fx'),btn=(currentLang!=='he'?document.getElementById('main-btn-inline'):null)||document.getElementById('main-btn'),r=btn.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;['rgba(91,63,232,.5)','rgba(244,63,142,.4)','rgba(6,182,212,.4)'].forEach((c,i)=>{const ring=document.createElement('div');ring.className='ring';ring.style.cssText=`left:${cx}px;top:${cy}px;width:70px;height:70px;border:2px solid ${c};animation-delay:${i*.14}s`;fx.appendChild(ring);setTimeout(()=>ring.remove(),800);});const cols=['#9B7DFF','#06B6D4','#F43F8E','#F59E0B','#10B981'];for(let i=0;i<24;i++){const p=document.createElement('div');p.className='part';const a=(i/24)*Math.PI*2,d=60+Math.random()*100;p.style.cssText=`left:${cx}px;top:${cy}px;width:${5+Math.random()*7}px;height:${5+Math.random()*7}px;background:${cols[i%5]};--tx:${Math.cos(a)*d}px;--ty:${Math.sin(a)*d}px;animation-delay:${Math.random()*.15}s;border-radius:${Math.random()>.5?'50%':'3px'}`;fx.appendChild(p);setTimeout(()=>p.remove(),1100);}}
 
 // Subscribe to realtime changes
 db.channel('public:reads').on('postgres_changes',{event:'INSERT',schema:'public',table:'reads'},()=>loadData()).subscribe();
@@ -1242,6 +1182,8 @@ function launchFireworks() {
 }
 
 // ── שפות ──
+const LANGS = ['he','en','fr'];
+const LANG_LABELS = {he:'עב', en:'EN', fr:'FR'};
 
 const TRANSLATIONS = {
   en: {
@@ -1254,17 +1196,9 @@ const TRANSLATIONS = {
       'Enter His gates with thanksgiving, His courts with praise; give thanks to Him, bless His name.',
       'For God is good; His lovingkindness is everlasting, and His faithfulness to all generations.'
     ],
-    chipTitle: 'The Million Project',
-    chipTagline: 'One million times Psalm of Thanksgiving',
-    chipSub: 'In gratitude to the Creator',
-    chipBody: 'For all the miracles and wonders, the revealed and hidden salvations — in the Land and throughout the world — known to us and unknown to us, in general and in particular',
-    chipCta: 'Please join the Million Psalm Project!! ↓',
-    chipInfo: 'Psalm of Thanksgiving is the 100th Psalm — a prayer of gratitude composed by Moses (according to Rashi). According to the Shulchan Aruch it should be recited with melody and song. The Midrash states that in the future all prayers will cease except for Psalm of Thanksgiving! Reciting it is not only gratitude for the past — it has the power to bring salvation in the future!!',
-    pageTitle: 'Shared Psalm Reading',
-    pageSub: 'Join the reading of Psalm of Thanksgiving',
     btnText: 'I said the Psalm',
     btnAgain: '↺ Read again',
-    myReadsNote: (n) => `You read <b>${n}</b> times — well done! 🙏`,
+    myReadsText: (n) => `You read ${n} times — well done! 🙏`,
     liveNow: 'Live now',
     shareBtn: '⬆ Share',
     uniqueReaders: 'Unique readers',
@@ -1274,39 +1208,14 @@ const TRANSLATIONS = {
     psalms: 'psalms',
     reminderTitle: '🔔 Daily Reminder',
     reminderSub: 'Get a reminder every day at 10:00 and 20:00',
-    reminderBtn: '<span>🔔</span><span>Enable reminders</span>',
+    reminderBtn: '🔔 Enable reminders',
     reminderDone: '✅ Great! You\'ll get reminders at 10:00 and 20:00',
-    reminderDoneSub: 'If you don\'t receive notifications — check that notifications are allowed in browser settings',
     reminderCancel: 'Cancel',
-    shareCardTitle: 'Share the project',
-    shareCardSub: 'Invite more people to read together',
-    copyLink: '🔗 Copy link',
-    refCardTitle: '🔗 Create personal link',
-    refCardSub: 'Share your personal link and see how many people joined because of you',
-    refInputLabel: 'Enter a short name or nickname (in Hebrew or English)',
-    refInputPlaceholder: 'Short name or nickname',
-    refCreateBtn: 'Create / Load',
-    refCacheNote: 'As long as you haven\'t cleared cache — data will appear automatically. If you switched devices — enter name + access code.',
-    refCodeAskLabel: 'Name exists — enter access code to view data:',
-    refCodePlaceholder: 'Access code (6 digits)',
-    refCodeConfirm: 'Confirm',
-    refLinkLabel: '✨ Your link — copy and share!',
-    refCopyBtn: '📋 Copy link',
-    refCodeBoxLabel: 'Your personal access code',
-    refCodeSaveNote: 'Save it — you\'ll need it if you switch devices or clear cache',
-    refCopyCode: '📋 Copy code',
-    refStatsTitle: '📊 Your statistics',
-    refStatsReads: 'Readings',
-    refStatsUniq: 'Unique people',
-    refMyLink: 'Your link:',
-    privacyBtn: 'Privacy Policy',
+    shareTitle: 'Share the project',
+    shareSub: 'Invite more people to read together',
+    personalLink: '🔗 Create personal link',
+    personalLinkSub: 'Share your link and see how many people joined because of you',
     toastRead: '🙏 Thank you! The chapter was recorded',
-    toastLinkCopied: 'Link copied ✓',
-    toastDataLoaded: 'Data loaded ✓',
-    toastLinkCreated: 'Link created successfully! ✓',
-    toastNameTaken: (name) => `The name "${name}" is already taken — enter access code or choose another name`,
-    toastNameExists: (name) => `The name "${name}" already exists — if this is your link, enter the access code. Otherwise choose another name.`,
-    chipCredits: 'Compiled and initiated by: Dr. Nurit Sirkis Bank\u00a0|\u00a0Digital placement: Sivan',
     shabbatTitle: 'Shabbat Shalom',
     shabbatSub: 'The site is closed for Shabbat\nSee you after Shabbat 🙏',
   },
@@ -1320,17 +1229,9 @@ const TRANSLATIONS = {
       'Entrez dans ses portes avec action de grâce, dans ses parvis avec louange; célébrez-Le, bénissez son nom.',
       'Car Dieu est bon; sa bonté dure à toujours, et sa fidélité de génération en génération.'
     ],
-    chipTitle: 'Le Projet du Million',
-    chipTagline: 'Un million de fois le Psaume d\'action de grâce',
-    chipSub: 'En gratitude envers le Créateur',
-    chipBody: 'Pour tous les miracles et les merveilles, les délivrances révélées et cachées — en Terre d\'Israël et dans le monde entier — connues et inconnues, en général et en particulier',
-    chipCta: 'Rejoignez le Projet du Million de Psaumes!! ↓',
-    chipInfo: 'Le Psaume d\'action de grâce est le 100e Psaume — une prière de gratitude composée par Moïse (selon Rachi). Selon le Choulhan Aroukh il doit être récité avec mélodie et chant. Le Midrach enseigne qu\'à l\'avenir toutes les prières cesseront sauf le Psaume d\'action de grâce! Le réciter n\'est pas seulement de la gratitude pour le passé — il a le pouvoir d\'apporter le salut à l\'avenir!!',
-    pageTitle: 'Lecture commune des Psaumes',
-    pageSub: 'Rejoignez la lecture du Psaume d\'action de grâce',
     btnText: 'J\'ai dit le Psaume',
     btnAgain: '↺ Lire encore',
-    myReadsNote: (n) => `Vous avez lu <b>${n}</b> fois — bravo! 🙏`,
+    myReadsText: (n) => `Vous avez lu ${n} fois — bravo! 🙏`,
     liveNow: 'En direct',
     shareBtn: '⬆ Partager',
     uniqueReaders: 'Lecteurs uniques',
@@ -1340,43 +1241,20 @@ const TRANSLATIONS = {
     psalms: 'psaumes',
     reminderTitle: '🔔 Rappel quotidien',
     reminderSub: 'Recevez un rappel chaque jour à 10h00 et 20h00',
-    reminderBtn: '<span>🔔</span><span>Activer les rappels</span>',
+    reminderBtn: '🔔 Activer les rappels',
     reminderDone: '✅ Super! Vous recevrez des rappels à 10h00 et 20h00',
-    reminderDoneSub: 'Si vous ne recevez pas de notifications — vérifiez que les notifications sont autorisées dans les paramètres du navigateur',
     reminderCancel: 'Annuler',
-    shareCardTitle: 'Partager le projet',
-    shareCardSub: 'Invitez d\'autres personnes à lire ensemble',
-    copyLink: '🔗 Copier le lien',
-    refCardTitle: '🔗 Créer un lien personnel',
-    refCardSub: 'Partagez votre lien personnel et voyez combien de personnes ont rejoint grâce à vous',
-    refInputLabel: 'Entrez un nom court ou un surnom (en hébreu ou en anglais)',
-    refInputPlaceholder: 'Nom court ou surnom',
-    refCreateBtn: 'Créer / Charger',
-    refCacheNote: 'Tant que vous n\'avez pas vidé le cache — les données apparaîtront automatiquement. Si vous avez changé d\'appareil — entrez nom + code d\'accès.',
-    refCodeAskLabel: 'Nom existant — entrez le code d\'accès pour voir les données:',
-    refCodePlaceholder: 'Code d\'accès (6 chiffres)',
-    refCodeConfirm: 'Confirmer',
-    refLinkLabel: '✨ Votre lien — copiez et partagez!',
-    refCopyBtn: '📋 Copier le lien',
-    refCodeBoxLabel: 'Votre code d\'accès personnel',
-    refCodeSaveNote: 'Sauvegardez-le — vous en aurez besoin si vous changez d\'appareil ou videz le cache',
-    refCopyCode: '📋 Copier le code',
-    refStatsTitle: '📊 Vos statistiques',
-    refStatsReads: 'Lectures',
-    refStatsUniq: 'Personnes uniques',
-    refMyLink: 'Votre lien:',
-    privacyBtn: 'Politique de confidentialité',
+    shareTitle: 'Partager le projet',
+    shareSub: 'Invitez d\'autres personnes à lire ensemble',
+    personalLink: '🔗 Créer un lien personnel',
+    personalLinkSub: 'Partagez votre lien et voyez combien de personnes ont rejoint grâce à vous',
     toastRead: '🙏 Merci! Le chapitre a été enregistré',
-    toastLinkCopied: 'Lien copié ✓',
-    toastDataLoaded: 'Données chargées ✓',
-    toastLinkCreated: 'Lien créé avec succès! ✓',
-    toastNameTaken: (name) => `Le nom "${name}" est déjà pris — entrez le code d'accès ou choisissez un autre nom`,
-    toastNameExists: (name) => `Le nom "${name}" existe déjà — si c'est votre lien, entrez le code d'accès. Sinon choisissez un autre nom.`,
-    chipCredits: 'Compilé et initié par: Dr. Nurit Sirkis Bank\u00a0|\u00a0Mise en ligne digitale: Sivan',
     shabbatTitle: 'Chabbat Chalom',
     shabbatSub: 'Le site est fermé pour Chabbat\nÀ bientôt après Chabbat 🙏',
   }
 };
+
+let currentLang = localStorage.getItem('ps_lang') || detectLang();
 
 function detectLang() {
   const bl = (navigator.language || navigator.userLanguage || 'he').toLowerCase();
@@ -1385,176 +1263,104 @@ function detectLang() {
   return 'en';
 }
 
-let currentLang = localStorage.getItem('ps_lang') || detectLang();
-
-function toggleLangMenu() {
-  const menu = document.getElementById('lang-menu');
-  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-}
-
-function setLang(lang) {
-  currentLang = lang;
-  localStorage.setItem('ps_lang', lang);
-  document.getElementById('lang-menu').style.display = 'none';
+function cycleLang() {
+  const idx = LANGS.indexOf(currentLang);
+  currentLang = LANGS[(idx + 1) % LANGS.length];
+  localStorage.setItem('ps_lang', currentLang);
   applyLang();
 }
 
-// סגור תפריט בלחיצה מחוץ
-document.addEventListener('click', function(e) {
-  const wrap = document.getElementById('lang-wrap');
-  if (wrap && !wrap.contains(e.target)) {
-    const menu = document.getElementById('lang-menu');
-    if (menu) menu.style.display = 'none';
-  }
-});
-
-function T(key, ...args) {
-  if (currentLang === 'he') return null;
-  const t = TRANSLATIONS[currentLang];
-  if (!t) return null;
-  const val = t[key];
-  if (typeof val === 'function') return val(...args);
-  return val || null;
-}
-
 function applyLang() {
-  const labelEl = document.getElementById('lang-label');
-  const labels = {he:'עב', en:'EN', fr:'FR'};
-  if (labelEl) labelEl.textContent = labels[currentLang];
+  const btn = document.getElementById('lang-btn');
+  if (btn) btn.textContent = LANG_LABELS[currentLang];
 
   const isHe = currentLang === 'he';
-  const t = isHe ? null : TRANSLATIONS[currentLang];
+  const t = TRANSLATIONS[currentLang];
 
+  // psalm translation
   const transEl = document.getElementById('psalm-translation');
   if (transEl) transEl.style.display = isHe ? 'none' : 'block';
-  const ctaInline = document.getElementById('cta-inline');
-  if (ctaInline) ctaInline.style.display = isHe ? 'none' : 'block';
-  // הסתר את הכפתור הרגיל בשפה זרה
-  const ctaArea = document.querySelector('.cta-area');
-  if (ctaArea) ctaArea.style.display = isHe ? 'block' : 'none';
-  document.documentElement.dir = isHe ? 'rtl' : 'ltr';
-  document.documentElement.lang = currentLang;
-
-  ['he','en','fr'].forEach(l => {
-    const el = document.getElementById('privacy-content-' + l);
-    if (el) el.style.display = (l === currentLang) ? 'block' : 'none';
-  });
-
-  function set(id, val) { const el = document.getElementById(id); if (el && val !== null) el.textContent = val; }
-  function setHTML(id, val) { const el = document.getElementById(id); if (el && val !== null) el.innerHTML = val; }
-  function setQ(sel, val) { const el = document.querySelector(sel); if (el && val !== null) el.textContent = val; }
-  function setQHTML(sel, val) { const el = document.querySelector(sel); if (el && val !== null) el.innerHTML = val; }
-  function setAttr(id, attr, val) { const el = document.getElementById(id); if (el && val !== null) el.setAttribute(attr, val); }
 
   if (!isHe && t) {
-    set('psalm-chapter-label', t.psalmChapter);
-    set('psalm-title-text', t.psalmTitle);
-    for (let i = 1; i <= 5; i++) { const el = document.getElementById('psalm-v'+i+'-trans'); if (el) el.textContent = t.verses[i-1]; }
-    set('chip-title', t.chipTitle);
-    set('chip-tagline', t.chipTagline);
-    set('chip-sub', t.chipSub);
-    set('chip-body', t.chipBody);
-    const ctaEl = document.getElementById('chip-cta'); if (ctaEl) ctaEl.textContent = t.chipCta;
-    setHTML('chip-info', t.chipInfo);
-    set('chip-credits', t.chipCredits);
-    set('pg-title', t.pageTitle);
-    set('pg-sub', t.pageSub);
-    const btnTxt = document.getElementById('btn-txt'); if (btnTxt) btnTxt.textContent = myReads > 0 ? t.btnAgain : t.btnText;
-    const btnTxtInline = document.getElementById('btn-txt-inline'); if (btnTxtInline) btnTxtInline.textContent = myReads > 0 ? t.btnAgain : t.btnText;
-    const againBtnInline = document.getElementById('again-btn-inline'); if (againBtnInline) againBtnInline.textContent = t.btnAgain;
-    if (myReads > 0) {
-      const mainBtnInline = document.getElementById('main-btn-inline'); if (mainBtnInline) mainBtnInline.classList.add('done');
-      const againBtnInlineEl = document.getElementById('again-btn-inline'); if (againBtnInlineEl) againBtnInlineEl.style.display = 'inline-flex';
-      const noteInline = document.getElementById('note-inline'); if (noteInline) { noteInline.innerHTML = t.myReadsNote(myReads); noteInline.style.display = 'block'; }
+    document.getElementById('psalm-chapter-label').textContent = t.psalmChapter;
+    document.getElementById('psalm-title-text').textContent = t.psalmTitle;
+    for (let i = 1; i <= 5; i++) {
+      const el = document.getElementById('psalm-v' + i + '-trans');
+      if (el) el.textContent = t.verses[i-1];
     }
-    setQ('#again-btn', t.btnAgain);
-    const noteEl = document.getElementById('note'); if (noteEl) noteEl.innerHTML = t.myReadsNote(myReads);
-    setQHTML('.live-pill', '<div class="ldot"></div>' + t.liveNow);
-    setQ('.share-btn', t.shareBtn);
-    const stl = document.querySelectorAll('.st-l');
-    if (stl[0]) stl[0].textContent = t.uniqueReaders;
-    if (stl[1]) stl[1].textContent = t.totalReads;
-    if (stl[2]) stl[2].textContent = t.myReads;
+    // כפתורים
+    const btnTxt = document.getElementById('btn-txt');
+    if (btnTxt) btnTxt.textContent = t.btnText;
+    const againBtn = document.getElementById('again-btn');
+    if (againBtn) againBtn.textContent = t.btnAgain;
+    // live pill
+    const livePill = document.querySelector('.live-pill');
+    if (livePill) livePill.innerHTML = '<div class="ldot"></div>' + t.liveNow;
+    // share btn
+    const shareBtn = document.querySelector('.share-btn');
+    if (shareBtn) shareBtn.textContent = t.shareBtn;
+    // stats labels
+    const stLabels = document.querySelectorAll('.st-l');
+    if (stLabels[0]) stLabels[0].textContent = t.uniqueReaders;
+    if (stLabels[1]) stLabels[1].textContent = t.totalReads;
+    if (stLabels[2]) stLabels[2].textContent = t.myReads;
+    // of txt
     const ofTxt = document.querySelector('.of-txt');
-    if (ofTxt) ofTxt.innerHTML = t.outOf + ' <span id="target-el">' + (document.getElementById('target-el')||{textContent:''}).textContent + '</span>';
-    setQ('.lbl-txt', t.psalms);
-    setQ('.rem-card h4', t.reminderTitle);
-    setQ('#rem-body .sub', t.reminderSub);
-    setQHTML('#rem-btn', t.reminderBtn);
-    const remDoneDiv = document.querySelector('#rem-done > div:first-child');
-    if (remDoneDiv) remDoneDiv.childNodes[0].textContent = t.reminderDone + ' ';
-    const remDoneSub = document.querySelector('#rem-done > div:last-child');
-    if (remDoneSub) remDoneSub.textContent = t.reminderDoneSub;
-    setQ('.share-card h4', t.shareCardTitle);
-    setQ('.share-card p', t.shareCardSub);
-    setQ('#cp-btn', t.copyLink);
-    setQ('.ref-card-title', t.refCardTitle);
-    setQ('.ref-card-sub', t.refCardSub);
-    set('ref-input-label', t.refInputLabel);
-    setAttr('my-ref-name', 'placeholder', t.refInputPlaceholder);
-    setQ('#ref-create-btn', t.refCreateBtn);
-    set('ref-cache-note', t.refCacheNote);
-    set('ref-code-ask-label', t.refCodeAskLabel);
-    setAttr('my-ref-code-input', 'placeholder', t.refCodePlaceholder);
-    setQ('#my-ref-code-ask button', t.refCodeConfirm);
-    setQ('.ref-result-label', t.refLinkLabel);
-    setQ('.ref-copy-btn', t.refCopyBtn);
-    const codeBoxLabel = document.querySelector('#my-ref-code-box div:first-child'); if (codeBoxLabel) codeBoxLabel.textContent = t.refCodeBoxLabel;
-    const codeBoxNote = document.querySelector('#my-ref-code-box div:nth-child(3)'); if (codeBoxNote) codeBoxNote.textContent = t.refCodeSaveNote;
-    const copyCodeBtn = document.querySelector('#my-ref-code-box button'); if (copyCodeBtn) copyCodeBtn.textContent = t.refCopyCode;
-    setQ('.ref-stats-title', t.refStatsTitle);
-    const statLabels = document.querySelectorAll('.ref-stat-l');
-    if (statLabels[0]) statLabels[0].textContent = t.refStatsReads;
-    if (statLabels[1]) statLabels[1].textContent = t.refStatsUniq;
-    set('privacy-btn', t.privacyBtn);
-    const shabTitle = document.querySelector('#shabbat-screen div:nth-child(2)'); if (shabTitle) shabTitle.textContent = t.shabbatTitle;
-    const shabSub = document.querySelector('#shabbat-screen div:nth-child(3)'); if (shabSub) shabSub.innerHTML = t.shabbatSub.replace('\n','<br>');
-    window._toastRead = t.toastRead;
-    window._toastLinkCopied = t.toastLinkCopied;
-
+    if (ofTxt) ofTxt.innerHTML = t.outOf + ' <span id="target-el">' + (document.getElementById('target-el')||{}).textContent + '</span>';
+    // lbl txt
+    const lblTxt = document.querySelector('.lbl-txt');
+    if (lblTxt) lblTxt.textContent = t.psalms;
+    // reminder
+    const remTitle = document.querySelector('.rem-card h4');
+    if (remTitle) remTitle.textContent = t.reminderTitle;
+    const remSub = document.querySelector('#rem-body .sub');
+    if (remSub) remSub.textContent = t.reminderSub;
+    const remBtn = document.getElementById('rem-btn');
+    if (remBtn) remBtn.innerHTML = t.reminderBtn;
+    // share card
+    const shareCard = document.querySelector('.share-card h4');
+    if (shareCard) shareCard.textContent = t.shareTitle;
+    const shareCardP = document.querySelector('.share-card p');
+    if (shareCardP) shareCardP.textContent = t.shareSub;
+    // shabbat screen
+    const shabTitle = document.querySelector('#shabbat-screen div:nth-child(2)');
+    if (shabTitle) shabTitle.textContent = t.shabbatTitle;
+    const shabSub = document.querySelector('#shabbat-screen div:nth-child(3)');
+    if (shabSub) shabSub.innerHTML = t.shabbatSub.replace('\n','<br>');
   } else {
-    document.documentElement.dir = 'rtl';
-    set('psalm-chapter-label', 'תהילים · פרק קֳ');
-    set('psalm-title-text', 'מִזְמוֹר לְתוֹדָה');
-    set('chip-credits', (shared && shared.chipCredits) || 'ליקטה ויזמה: ד"ר נורית סירקיס בנק \u00a0|\u00a0 השמה דיגיטלית: סיון');
-    const btnTxt2 = document.getElementById('btn-txt'); if (btnTxt2) btnTxt2.textContent = myReads > 0 ? 'קראתי שוב' : 'אמרתי את הפרק';
-    setQ('#again-btn', '↺ קראתי שוב');
-    const noteEl2 = document.getElementById('note'); if (noteEl2) noteEl2.innerHTML = 'קראת <b id="my-n">' + myReads + '</b> פעמים — יישר כוח! 🙏';
-    setQHTML('.live-pill', '<div class="ldot"></div>חי עכשיו');
-    setQ('.share-btn', '⬆ שתף');
-    const stl2 = document.querySelectorAll('.st-l');
-    if (stl2[0]) stl2[0].textContent = 'קוראים ייחודיים';
-    if (stl2[1]) stl2[1].textContent = 'סה״כ קריאות';
-    if (stl2[2]) stl2[2].textContent = 'הקריאות שלי';
-    const ofTxt2 = document.querySelector('.of-txt');
-    if (ofTxt2) ofTxt2.innerHTML = 'מתוך <span id="target-el">' + (document.getElementById('target-el')||{textContent:''}).textContent + '</span>';
-    setQ('.lbl-txt', 'מזמורים');
-    setQ('.rem-card h4', '🔔 תזכורת למזמור לתודה');
-    setQ('#rem-body .sub', 'קבלו תזכורת כל יום ב-10:00 וב-20:00');
-    setQHTML('#rem-btn', '<span>🔔</span><span>הפעל תזכורות</span>');
-    setQ('.share-card h4', 'שתפו את המיזם');
-    setQ('.share-card p', 'הזמינו עוד אנשים לקרוא יחד');
-    setQ('#cp-btn', '🔗 העתק קישור');
-    setQ('.ref-card-title', '🔗 צור לינק אישי');
-    setQ('.ref-card-sub', 'פרסמו לינק אישי וראו כמה אנשים הגיעו בזכותכם');
-    set('ref-input-label', 'הכנס שם קצר או כינוי (בעברית או באנגלית)');
-    setAttr('my-ref-name', 'placeholder', 'שם קצר או כינוי');
-    setQ('#ref-create-btn', 'צור / טען');
-    set('ref-cache-note', 'כל עוד לא ניקיתם קאש — הנתונים יופיעו אוטומטית. אם עברתם למכשיר אחר — הכנס שם + קוד גישה.');
-    set('ref-code-ask-label', 'השם קיים — הכנס קוד גישה לצפייה בנתונים:');
-    setAttr('my-ref-code-input', 'placeholder', 'קוד גישה (6 ספרות)');
-    setQ('#my-ref-code-ask button', 'אישור');
-    setQ('.ref-result-label', '✨ הלינק שלכם — העתיקו ושתפו!');
-    setQ('.ref-copy-btn', '📋 העתק לינק לשיתוף');
-    setQ('.ref-stats-title', '📊 הסטטיסטיקות שלכם');
-    const statLabels2 = document.querySelectorAll('.ref-stat-l');
-    if (statLabels2[0]) statLabels2[0].textContent = 'קריאות';
-    if (statLabels2[1]) statLabels2[1].textContent = 'אנשים ייחודיים';
-    set('privacy-btn', 'מדיניות פרטיות');
-    const shabTitle2 = document.querySelector('#shabbat-screen div:nth-child(2)'); if (shabTitle2) shabTitle2.textContent = 'שבת שלום';
-    const shabSub2 = document.querySelector('#shabbat-screen div:nth-child(3)'); if (shabSub2) shabSub2.innerHTML = 'האתר סגור לכבוד השבת<br>נתראה במוצאי שבת 🙏';
-    window._toastRead = null;
-    window._toastLinkCopied = null;
+    // חזור לעברית
+    document.getElementById('psalm-chapter-label').textContent = 'תהילים · פרק ק׳';
+    document.getElementById('psalm-title-text').textContent = 'מִזְמוֹר לְתוֹדָה';
+    const btnTxt = document.getElementById('btn-txt');
+    if (btnTxt && myReads === 0) btnTxt.textContent = 'אמרתי את הפרק';
+    const againBtn = document.getElementById('again-btn');
+    if (againBtn) againBtn.textContent = '↺ קראתי שוב';
+    const livePill = document.querySelector('.live-pill');
+    if (livePill) livePill.innerHTML = '<div class="ldot"></div>חי עכשיו';
+    const shareBtn = document.querySelector('.share-btn');
+    if (shareBtn) shareBtn.textContent = '⬆ שתף';
+    const stLabels = document.querySelectorAll('.st-l');
+    if (stLabels[0]) stLabels[0].textContent = 'קוראים ייחודיים';
+    if (stLabels[1]) stLabels[1].textContent = 'סה״כ קריאות';
+    if (stLabels[2]) stLabels[2].textContent = 'הקריאות שלי';
+    const ofTxt = document.querySelector('.of-txt');
+    if (ofTxt) ofTxt.innerHTML = 'מתוך <span id="target-el">' + (document.getElementById('target-el')||{}).textContent + '</span>';
+    const lblTxt = document.querySelector('.lbl-txt');
+    if (lblTxt) lblTxt.textContent = 'מזמורים';
+    const remTitle = document.querySelector('.rem-card h4');
+    if (remTitle) remTitle.textContent = '🔔 תזכורת למזמור לתודה';
+    const remSub = document.querySelector('#rem-body .sub');
+    if (remSub) remSub.textContent = 'קבלו תזכורת כל יום ב-10:00 וב-20:00';
+    const remBtn = document.getElementById('rem-btn');
+    if (remBtn) remBtn.innerHTML = '<span>🔔</span><span>הפעל תזכורות</span>';
+    const shareCard = document.querySelector('.share-card h4');
+    if (shareCard) shareCard.textContent = 'שתפו את המיזם';
+    const shareCardP = document.querySelector('.share-card p');
+    if (shareCardP) shareCardP.textContent = 'הזמינו עוד אנשים לקרוא יחד';
+    const shabTitle = document.querySelector('#shabbat-screen div:nth-child(2)');
+    if (shabTitle) shabTitle.textContent = 'שבת שלום';
+    const shabSub = document.querySelector('#shabbat-screen div:nth-child(3)');
+    if (shabSub) shabSub.innerHTML = 'האתר סגור לכבוד השבת<br>נתראה במוצאי שבת 🙏';
   }
 }
 
