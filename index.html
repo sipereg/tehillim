@@ -709,10 +709,16 @@ function renderDOM() {
   checkMilestone(shared.total);
   if (myReads > 0) {
     document.getElementById('note').style.display = 'block';
-    document.getElementById('my-n').textContent   = myReads;
-    document.getElementById('btn-txt').textContent = 'קראתי שוב';
+    const myNEl = document.getElementById('my-n');
+    if (myNEl) myNEl.textContent = myReads;
+    const t = TRANSLATIONS[currentLang];
+    document.getElementById('btn-txt').textContent = t ? t.btnAgain : 'קראתי שוב';
     document.getElementById('main-btn').classList.add('done');
     document.getElementById('again-btn').style.display = 'inline-flex';
+    const againBtn = document.getElementById('again-btn');
+    if (againBtn) againBtn.textContent = t ? t.btnAgain : '↺ קראתי שוב';
+    const noteEl = document.getElementById('note');
+    if (noteEl) noteEl.innerHTML = t ? t.myReadsNote(myReads) : 'קראת <b id="my-n">' + myReads + '</b> פעמים — יישר כוח! 🙏';
   }
   document.body.classList.toggle('dark', dark);
   document.getElementById('theme-btn').textContent = dark ? '☀️' : '🌙';
@@ -1433,7 +1439,7 @@ function applyLang() {
     set('chip-credits', t.chipCredits);
     set('pg-title', t.pageTitle);
     set('pg-sub', t.pageSub);
-    const btnTxt = document.getElementById('btn-txt'); if (btnTxt) btnTxt.textContent = myReads > 0 ? t.btnAgain.replace('↺ ','') : t.btnText;
+    const btnTxt = document.getElementById('btn-txt'); if (btnTxt) btnTxt.textContent = myReads > 0 ? t.btnAgain : t.btnText;
     setQ('#again-btn', t.btnAgain);
     const noteEl = document.getElementById('note'); if (noteEl) noteEl.innerHTML = t.myReadsNote(myReads);
     setQHTML('.live-pill', '<div class="ldot"></div>' + t.liveNow);
