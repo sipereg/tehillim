@@ -890,7 +890,8 @@ async function markRead() {
   burst();
   toast(window._toastRead || '🙏 תודה! הפרק נרשם');
   // save to server with retry
-  const saved = await saveRead(myId, urlRef);
+ const langSuffix = currentLang !== 'he' ? '_' + currentLang : '';
+const saved = await saveRead(myId, urlRef + langSuffix);
   if(saved) await loadData();
 }
 
