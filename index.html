@@ -1378,9 +1378,14 @@ const TRANSLATIONS = {
   }
 };
 
-let currentLang = localStorage.getItem('ps_lang') || detectLang();
-
 function detectLang() {
+  const bl = (navigator.language || navigator.userLanguage || 'he').toLowerCase();
+  if (bl.startsWith('fr')) return 'fr';
+  if (bl.startsWith('he') || bl.startsWith('iw')) return 'he';
+  return 'en';
+}
+
+let currentLang = localStorage.getItem('ps_lang') || detectLang();
   const bl = (navigator.language || navigator.userLanguage || 'he').toLowerCase();
   if (bl.startsWith('fr')) return 'fr';
   if (bl.startsWith('he') || bl.startsWith('iw')) return 'he';
