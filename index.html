@@ -975,7 +975,7 @@ async function handleRefBtn() {
   // אם יש localStorage — טען ישירות
   const savedRef = localStorage.getItem('my_ref');
   const savedCode = localStorage.getItem('my_ref_code');
-  if (savedRef === ref && savedCode) {
+  if (savedRef && savedRef.toLowerCase() === ref.toLowerCase() && savedCode) {
     showMyLink(ref, savedCode, false);
     loadMyRefStats(ref);
     btn.textContent = 'צור / טען';
@@ -985,6 +985,7 @@ async function handleRefBtn() {
 
   try {
  const { data: existingRows, error: refErr } = await db.from('refs').select('ref,code').ilike('ref', ref).limit(1);
+if (refErr) throw refErr;
 const existing = existingRows?.[0] ?? null;
     if (existing) {
       if (!existing.code) {
