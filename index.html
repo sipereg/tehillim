@@ -984,7 +984,8 @@ async function handleRefBtn() {
   }
 
   try {
-   const { data: existing } = await db.from('refs').select('ref,code').ilike('ref', ref).maybeSingle();
+ const { data: existingRows, error: refErr } = await db.from('refs').select('ref,code').ilike('ref', ref).limit(1);
+const existing = existingRows?.[0] ?? null;
     if (existing) {
       if (!existing.code) {
         // נרשם לפני מערכת הקוד — גישה חופשית
