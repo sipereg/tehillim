@@ -1006,9 +1006,10 @@ const existing = existingRows?.[0] ?? null;
     } else {
       // שם חדש — צור
       const code = generateCode();
-      await db.from('refs').insert({ ref, name, code });
-      localStorage.setItem('my_ref', ref);
-      localStorage.setItem('my_ref_code', code);
+const { error: insertErr } = await db.from('refs').insert({ ref, name, code });
+if (insertErr) throw insertErr;
+localStorage.setItem('my_ref', ref);
+localStorage.setItem('my_ref_code', code);
       showMyLink(ref, code, true);
       loadMyRefStats(ref);
       toast((TRANSLATIONS[currentLang]||{}).toastLinkCreated || 'הלינק נוצר בהצלחה! ✓');
